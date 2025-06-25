@@ -260,23 +260,29 @@ const RightPanel = () => {
   return (
     <div className="flex flex-col sm:flex-row flex-1 p-4 gap-4">
       {/* Left Section */}
-      <div className="w-full sm:w-1/4 flex flex-col gap-4">
+      <div className="w-full sm:w-1/4 flex flex-col gap-4 font-bpg-nino">
         {categoriesLeft.map((item, index) => (
           <div
             key={index}
             className="flex items-start gap-3 p-3 bg-white shadow rounded"
           >
+            {/* Icon */}
             <img
               src={item.icon}
               alt="icon"
               className="w-12 h-12 object-contain"
             />
+            {/* Text Block */}
             <div className="flex flex-col">
               <h2 className="font-bold text-gray-800 text-sm sm:text-base">
                 {item.title}
               </h2>
+              <p className="text-gray-600 text-sm mb-1">{item.description}</p>
               <p className="text-gray-700 text-sm">
-                ჯგუფის წონა: {item.annualGrowth}%
+                ჯგუფის წონა: {item.annualGrowth}
+              </p>
+              <p className="text-gray-700 text-sm">
+                ფასის ცვლილება: {item.priceChange}
               </p>
             </div>
           </div>
@@ -284,28 +290,82 @@ const RightPanel = () => {
       </div>
 
       {/* Center Diagram */}
-      <div className="w-full sm:w-1/2 flex items-center justify-center bg-gray-100 rounded min-h-[400px]">
+      <div className="w-full sm:w-1/2 flex flex-col items-center justify-center bg-gray-100 rounded min-h-[400px] p-4">
         <svg ref={svgRef}></svg>
+
+        {/* Color Legend */}
+        <div className="mt-6 flex flex-col items-center">
+          <div className="text-sm font-medium text-gray-700 mb-2">
+            ფასების პროცენტული ცვლილება
+          </div>
+          <div className="flex items-center">
+            <svg width="300" height="30">
+              <defs>
+                <linearGradient
+                  id="legendGradient"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="0%"
+                >
+                  <stop offset="0%" stopColor="#5D4E75" />
+                  <stop offset="16.67%" stopColor="#7C6A96" />
+                  <stop offset="33.33%" stopColor="#A8A8C8" />
+                  <stop offset="50%" stopColor="#E0E0E0" />
+                  <stop offset="66.67%" stopColor="#FFCC80" />
+                  <stop offset="83.33%" stopColor="#FF9F43" />
+                  <stop offset="100%" stopColor="#E74C3C" />
+                </linearGradient>
+              </defs>
+              <rect
+                x="0"
+                y="5"
+                width="300"
+                height="20"
+                fill="url(#legendGradient)"
+                stroke="#999"
+                strokeWidth="1"
+              />
+            </svg>
+          </div>
+          <div className="flex justify-between w-[300px] mt-1 text-xs text-gray-600">
+            <span>-24</span>
+            <span>-12</span>
+            <span>-6</span>
+            <span>-2</span>
+            <span>0</span>
+            <span>2</span>
+            <span>6</span>
+            <span>12</span>
+            <span>24</span>
+          </div>
+        </div>
       </div>
 
       {/* Right Section */}
-      <div className="w-full sm:w-1/4 flex flex-col gap-4">
+      <div className="w-full sm:w-1/4 flex flex-col gap-4 font-bpg-nino">
         {categoriesRight.map((item, index) => (
           <div
             key={index}
             className="flex items-start gap-3 p-3 bg-white shadow rounded"
           >
+            {/* Icon */}
             <img
               src={item.icon}
               alt="icon"
               className="w-12 h-12 object-contain"
             />
+            {/* Text Block */}
             <div className="flex flex-col">
               <h2 className="font-bold text-gray-800 text-sm sm:text-base">
                 {item.title}
               </h2>
+              <p className="text-gray-600 text-sm mb-1">{item.description}</p>
               <p className="text-gray-700 text-sm">
-                ჯგუფის წონა: {item.annualGrowth}%
+                ჯგუფის წონა: {item.annualGrowth}
+              </p>
+              <p className="text-gray-700 text-sm">
+                ფასის ცვლილება: {item.priceChange}
               </p>
             </div>
           </div>
