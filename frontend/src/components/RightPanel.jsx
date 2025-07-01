@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
+import { Delaunay } from "d3-delaunay";
+
 import imgs1 from "../assets/images/food.png";
 import imgs2 from "../assets/images/alcohol.png";
 import imgs3 from "../assets/images/clothes.png";
@@ -14,359 +16,240 @@ import imgs11 from "../assets/images/hotel.png";
 import imgs12 from "../assets/images/goods.png";
 
 const categoriesLeft = [
-  {
-    icon: imgs1,
-    title: "სურსათი და უალკოჰოლო სასმელები",
-    description: "სურსათი, უალკოჰოლო სასმელები",
-    annualGrowth: "40.08%",
-    priceChange: "3.72%",
-  },
-  {
-    icon: imgs2,
-    title: "ალკოჰოლური სასმელები, თამბაქო",
-    description: "ალკოჰოლური სასმელები, თამბაქოს ნაწარმი",
-    annualGrowth: "2.88%",
-    priceChange: "5.79%",
-  },
-  {
-    icon: imgs3,
-    title: "ტანსაცმელი და ფეხსაცმელი",
-    description: "ტანსაცმელი და ფეხსაცმელი",
-    annualGrowth: "4.34%",
-    priceChange: "-9.02%",
-  },
-  {
-    icon: imgs4,
-    title: "საყოფაცხოვრებო ნივთები, ავეჯი და სახლის მოვლა",
-    description: "საყოფაცხოვრებო ნივთები, ავეჯი, საოჯახო ტექნიკა, სახლის მოვლა",
-    annualGrowth: "13.87%",
-    priceChange: "0.52%",
-  },
-  {
-    icon: imgs5,
-    title: "კომუნალური მომსახურება, წყალმომარაგება, გაზი და საწვავი",
-    description:
-      "ელექტროენერგია, ბუნებრივი გაზი, საწვავი; წყალმომარაგება, სანიტარული მომსახურება",
-    annualGrowth: "3.56%",
-    priceChange: "-2.42%",
-  },
-  {
-    icon: imgs6,
-    title: "ჯანმრთელობის დაცვა",
-    description: "ჯანმრთელობის მომსახურება, სამედიცინო პროდუქცია",
-    annualGrowth: "8.95%",
-    priceChange: "0.29%",
-  },
+  { icon: imgs1, title: "სურსათი და უალკოჰოლო სასმელები", description: "სურსათი, უალკოჰოლო სასმელები", annualGrowth: "40.08%", priceChange: "3.72%" },
+  { icon: imgs2, title: "ალკოჰოლური სასმელები, თამბაქო", description: "ალკოჰოლური სასმელები, თამბაქოს ნაწარმი", annualGrowth: "2.88%", priceChange: "5.79%" },
+  { icon: imgs3, title: "ტანსაცმელი და ფეხსაცმელი", description: "ტანსაცმელი და ფეხსაცმელი", annualGrowth: "4.34%", priceChange: "-9.02%" },
+  { icon: imgs4, title: "საყოფაცხოვრებო ნივთები, ავეჯი და სახლის მოვლა", description: "საყოფაცხოვრებო ნივთები, ავეჯი, საოჯახო ტექნიკა, სახლის მოვლა", annualGrowth: "13.87%", priceChange: "0.52%" },
+  { icon: imgs5, title: "კომუნალური მომსახურება, წყალმომარაგება, გაზი და საწვავი", description: "ელექტროენერგია, ბუნებრივი გაზი, საწვავი; წყალმომარაგება, სანიტარული მომსახურება", annualGrowth: "3.56%", priceChange: "-2.42%" },
+  { icon: imgs6, title: "ჯანმრთელობის დაცვა", description: "ჯანმრთელობის მომსახურება, სამედიცინო პროდუქცია", annualGrowth: "8.95%", priceChange: "0.29%" }
 ];
 
 const categoriesRight = [
-  {
-    icon: imgs7,
-    title: "ტრანსპორტი",
-    description:
-      "სატრანსპორტო საშუალებების შეძენა და ექსპლუატაცია; სატრანსპორტო მომსახურება",
-    annualGrowth: "10.44%",
-    priceChange: "12.78%",
-  },
-  {
-    icon: imgs8,
-    title: "კომუნიკაციები",
-    description: "საკომუნიკაციო მომსახურება და ტელეფონები",
-    annualGrowth: "4.24%",
-    priceChange: "0.29%",
-  },
-  {
-    icon: imgs9,
-    title: "დასვენება, გართობა და კულტურა",
-    description: "დასვენება, კულტურული და გართობის მომსახურება",
-    annualGrowth: "2.21%",
-    priceChange: "-1.01%",
-  },
-  {
-    icon: imgs10,
-    title: "განათლება",
-    description: "სასწავლო დაწესებულებების საფასური",
-    annualGrowth: "5.16%",
-    priceChange: "4.30%",
-  },
-  {
-    icon: imgs11,
-    title: "სასტუმროები, კაფეები და რესტორნები",
-    description: "სასტუმროები, კაფეები და რესტორნები",
-    annualGrowth: "1.81%",
-    priceChange: "1.19%",
-  },
-  {
-    icon: imgs12,
-    title: "სხვა სახის საქონელი და მომსახურება",
-    description: "პერსონალური საქონელი, დაზღვევა, ფინანსური მომსახურება",
-    annualGrowth: "2.34%",
-    priceChange: "0.78%",
-  },
+  { icon: imgs7, title: "ტრანსპორტი", description: "სატრანსპორტო საშუალებების შეძენა და ექსპლუატაცია; სატრანსპორტო მომსახურება", annualGrowth: "10.44%", priceChange: "12.78%" },
+  { icon: imgs8, title: "კომუნიკაციები", description: "საკომუნიკაციო მომსახურება და ტელეფონები", annualGrowth: "4.24%", priceChange: "0.29%" },
+  { icon: imgs9, title: "დასვენება, გართობა და კულტურა", description: "დასვენება, კულტურული და გართობის მომსახურება", annualGrowth: "2.21%", priceChange: "-1.01%" },
+  { icon: imgs10, title: "განათლება", description: "სასწავლო დაწესებულებების საფასური", annualGrowth: "5.16%", priceChange: "4.30%" },
+  { icon: imgs11, title: "სასტუმროები, კაფეები და რესტორნები", description: "სასტუმროები, კაფეები და რესტორნები", annualGrowth: "1.81%", priceChange: "1.19%" },
+  { icon: imgs12, title: "სხვა სახის საქონელი და მომსახურება", description: "პერსონალური საქონელი, დაზღვევა, ფინანსური მომსახურება", annualGrowth: "2.34%", priceChange: "0.78%" }
+];
+
+const legendRanges = [
+  { value: -24, fill: "rgb(51, 51, 102)", fillOpacity: 0.7 },
+  { value: -12, fill: "rgb(51, 102, 204)", fillOpacity: 0.7 },
+  { value: -6, fill: "#66ccff", fillOpacity: 0.7 },
+  { value: -2, fill: "#c1eaff", fillOpacity: 0.7 },
+  { value: 0, fill: "#d8e3e8", fillOpacity: 0.7 },
+  { value: 2, fill: "#fffadf", fillOpacity: 0.7 },
+  { value: 6, fill: "#ffcc33", fillOpacity: 0.7 },
+  { value: 12, fill: "#ff9900", fillOpacity: 0.7 },
+  { value: 24, fill: "#ff6600", fillOpacity: 0.7 }
+];
+
+const getColorForValue = (value) => {
+  for (let i = 0; i < legendRanges.length - 1; i++) {
+    if (value >= legendRanges[i].value && value < legendRanges[i + 1].value) {
+      return legendRanges[i];
+    }
+  }
+  if (value >= legendRanges[legendRanges.length - 1].value) {
+    return legendRanges[legendRanges.length - 1];
+  }
+  return legendRanges[0];
+};
+
+const data = [
+  { name: "სურსათი", value: -21.1, secondValue: 31.72 },
+  { name: "უალკოჰოლო სასმელები", value: 3.72, secondValue: 5.0 },
+  { name: "თამბაქო", value: 2.88, secondValue: 4.0 },
+  { name: "ტანსაცმელი", value: 5.79, secondValue: 6.5 },
+  { name: "ფეხსაცმელი", value: 4.34, secondValue: 5.2 },
+  { name: "ალკოჰოლი1", value: 9.02, secondValue: 10.0 },
+  { name: "ალკოჰოლი2", value: 13.87, secondValue: 15.0 },
+  { name: "ალკოჰოლი3", value: 3.56, secondValue: 4.2 },
+  { name: "ალკოჰოლი4", value: 2.42, secondValue: 3.1 },
+  { name: "ალკოჰოლი5", value: 0.29, secondValue: 0.5 },
+  { name: "ალკოჰოლი6", value: -1.01, secondValue: 25.0 },
+  { name: "ალკოჰოლი6", value: 2.34, secondValue: 25.0 },
+  { name: "ალკოჰოლი6", value: 8.95, secondValue: 25.0 },
+  { name: "ალკოჰოლი6", value: -9.02, secondValue: 25.0 },
+  { name: "ალკოჰოლი6", value: 13.87, secondValue: 25.0 },
+  { name: "ალკოჰოლი6", value: 3.56, secondValue: 25.0 },
+  { name: "ალკოჰოლი6", value: 2.21, secondValue: 25.0 },
+  { name: "ალკოჰოლი7", value: 4.24, secondValue: 60.0 }
 ];
 
 const RightPanel = () => {
   const svgRef = useRef();
 
-  const data = [
-    { name: "სურსათი", value: 40.08, color: "#FF8C42" },
-    { name: "ალკოჰოლი", value: 2.88, color: "#6699CC" },
-    { name: "ტანსაცმელი", value: 4.34, color: "#FFD23F" },
-    { name: "ავეჯი", value: 13.87, color: "#EE6C4D" },
-    { name: "კომუნალური", value: 3.56, color: "#A8DADC" },
-    { name: "ჯანმრთელობა", value: 8.95, color: "#457B9D" },
-    { name: "ტრანსპორტი", value: 10.44, color: "#F1C0E8" },
-    { name: "კომუნიკაცია", value: 4.24, color: "#CFBAF0" },
-    { name: "დასვენება", value: 2.21, color: "#A3C4F3" },
-    { name: "განათლება", value: 5.16, color: "#90DBF4" },
-    { name: "სასტუმროები", value: 1.81, color: "#8EECF5" },
-    { name: "სხვა", value: 2.34, color: "#98F5E1" },
-  ];
-
   useEffect(() => {
-    const svg = d3.select(svgRef.current);
-    svg.selectAll("*").remove();
-
     const width = 500;
     const height = 500;
     const radius = Math.min(width, height) / 2 - 10;
-    const centerX = width / 2;
-    const centerY = height / 2;
 
-    // Generate points based on data values
-    const points = [];
-    const totalValue = d3.sum(data, (d) => d.value);
+    const svg = d3.select(svgRef.current);
+    svg.selectAll("*").remove();
 
-    // Generate multiple points for each data item based on its value
-    data.forEach((d, i) => {
-      const numPoints = Math.max(1, Math.round((d.value / totalValue) * 50));
-      for (let j = 0; j < numPoints; j++) {
-        const angle = Math.random() * 2 * Math.PI;
-        const r = Math.random() * radius * 0.8;
-        const x = centerX + r * Math.cos(angle);
-        const y = centerY + r * Math.sin(angle);
-        points.push([x, y, i, d]);
-      }
+    const points = d3.range(data.length).map(() => {
+      const angle = Math.random() * 2 * Math.PI;
+      const r = Math.random() * radius * 0.9;
+      return [width / 2 + r * Math.cos(angle), height / 2 + r * Math.sin(angle)];
     });
 
-    // Create Voronoi diagram
-    const voronoi = d3.Delaunay.from(
-      points,
-      (d) => d[0],
-      (d) => d[1]
-    ).voronoi([0, 0, width, height]);
+    const delaunay = Delaunay.from(points);
+    const voronoi = delaunay.voronoi([0, 0, width, height]);
 
-    // Create clip path for circle
-    const defs = svg.append("defs");
-    defs
+    svg
+      .attr("width", width)
+      .attr("height", height)
+      .append("defs")
+      .append("filter")
+      .attr("id", "drop-shadow")
+      .append("feDropShadow")
+      .attr("dx", 2)
+      .attr("dy", 2)
+      .attr("stdDeviation", 2)
+      .attr("flood-color", "rgba(0, 0, 0, 0.2)");
+
+    svg
+      .append("circle")
+      .attr("cx", width / 2)
+      .attr("cy", height / 2)
+      .attr("r", radius)
+      .attr("fill", "none")
+      .attr("stroke", "grey")
+      .attr("stroke-width", 21);
+
+      svg
+      .append("circle")
+      .attr("cx", width / 2)
+      .attr("cy", height / 2)
+      .attr("r", radius)
+      .attr("fill", "none")
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 5);
+
+    svg
       .append("clipPath")
       .attr("id", "circle-clip")
       .append("circle")
-      .attr("cx", centerX)
-      .attr("cy", centerY)
+      .attr("cx", width / 2)
+      .attr("cy", height / 2)
       .attr("r", radius);
 
-    // Group cells by data index
-    const cellsByData = {};
-    points.forEach((point, i) => {
-      const dataIndex = point[2];
-      if (!cellsByData[dataIndex]) {
-        cellsByData[dataIndex] = [];
-      }
-      cellsByData[dataIndex].push(voronoi.renderCell(i));
-    });
-
-    // Create SVG
-    svg.attr("width", width).attr("height", height);
-
-    // Add outer circle border
-    svg
-      .append("circle")
-      .attr("cx", centerX)
-      .attr("cy", centerY)
-      .attr("r", radius)
-      .attr("fill", "none")
-      .attr("stroke", "#999")
-      .attr("stroke-width", 3);
-
-    // Add cells
     const g = svg.append("g").attr("clip-path", "url(#circle-clip)");
 
-    Object.entries(cellsByData).forEach(([dataIndex, cells]) => {
-      const dataItem = data[dataIndex];
+    const maxValue = d3.max(data, (d) => Math.abs(d.value));
+    const minStroke = 3;
+    const maxStroke = 8;
 
-      cells.forEach((cellPath) => {
-        if (cellPath) {
-          g.append("path")
-            .attr("d", cellPath)
-            .attr("fill", dataItem.color)
-            .attr("stroke", "#fff")
-            .attr("stroke-width", 2)
-            .attr("opacity", 0.8)
-            .on("mouseover", function (event) {
-              d3.select(this).attr("opacity", 1);
+    points.forEach((point, i) => {
+      const cell = voronoi.cellPolygon(i);
+      if (!cell) return;
 
-              // Show tooltip
-              const tooltip = d3
-                .select("body")
-                .append("div")
-                .attr("class", "tooltip")
-                .style("position", "absolute")
-                .style("background", "rgba(0,0,0,0.8)")
-                .style("color", "white")
-                .style("padding", "8px")
-                .style("border-radius", "4px")
-                .style("font-size", "12px")
-                .style("pointer-events", "none")
-                .style("z-index", "1000")
-                .html(`${dataItem.name}: ${dataItem.value}%`);
+      const { fill, fillOpacity } = getColorForValue(data[i].value);
 
-              tooltip
-                .style("left", event.pageX + 10 + "px")
-                .style("top", event.pageY - 10 + "px");
-            })
-            .on("mouseout", function () {
-              d3.select(this).attr("opacity", 0.8);
-              d3.selectAll(".tooltip").remove();
-            });
-        }
-      });
-    });
+      g.append("path")
+        .attr("d", "M" + cell.join("L") + "Z")
+        .attr("fill", fill)
+        .attr("fill-opacity", fillOpacity)
+        .attr("stroke", "#fff")
+        .attr("stroke-width", () => {
+          const val = Math.abs(data[i].value);
+          return minStroke + (val / maxValue) * (maxStroke - minStroke);
+        })
+        .attr("opacity", 0.9)
+        .style("filter", "url(#drop-shadow)")
+        .on("mouseover", function (event) {
+          d3.select(this)
+            .attr("opacity", 1)
+            .attr("stroke-width", 7)
+            .attr("stroke", "white");
 
-    // Add center labels for major categories
-    const majorCategories = data.filter((d) => d.value > 8);
-    majorCategories.forEach((d) => {
-      // Find a good position for the label
-      const angle = Math.random() * 2 * Math.PI;
-      const r = radius * 0.3;
-      const x = centerX + r * Math.cos(angle);
-      const y = centerY + r * Math.sin(angle);
+          const tooltip = d3
+            .select("body")
+            .append("div")
+            .attr("class", "tooltip")
+            .style("position", "absolute")
+            .style("background", "rgba(255,255,255)")
+            .style("color", "black")
+            .style("padding", "8px")
+            .style("border-radius", "4px")
+            .style("font-size", "12px")
+            .style("font-family", "BPG Nino Mtavruli")
+            .style("pointer-events", "none")
+            .style("z-index", "1000")
+            .html(`${data[i].name}<br/>ფასების ცვლილება: ${data[i].value}%<br/>წონა: ${data[i].secondValue}%`);
 
-      g.append("text")
-        .attr("x", x)
-        .attr("y", y)
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "middle")
-        .attr("font-size", "10px")
-        .attr("font-weight", "bold")
-        .attr("fill", "#333")
-        .attr("stroke", "white")
-        .attr("stroke-width", 3)
-        .attr("paint-order", "stroke")
-        .text(`${d.value}%`);
+          tooltip
+            .style("left", event.pageX + 10 + "px")
+            .style("top", event.pageY - 10 + "px");
+        })
+        .on("mouseout", function () {
+          d3.select(this)
+            .attr("opacity", 0.9)
+            .attr("stroke-width", 3)
+            .attr("stroke", "#fff");
+
+          d3.selectAll(".tooltip").remove();
+        });
     });
   }, []);
 
   return (
     <div className="flex flex-col sm:flex-row flex-1 p-4 gap-4">
-      {/* Left Section */}
       <div className="w-full sm:w-1/4 flex flex-col gap-4 font-bpg-nino">
         {categoriesLeft.map((item, index) => (
-          <div
-            key={index}
-            className="flex items-start gap-3 p-3 bg-white shadow rounded"
-          >
-            {/* Icon */}
-            <img
-              src={item.icon}
-              alt="icon"
-              className="w-12 h-12 object-contain"
-            />
-            {/* Text Block */}
+          <div key={index} className="flex items-start gap-3 p-3 bg-white shadow rounded">
+            <img src={item.icon} alt="icon" className="w-12 h-12 object-contain" />
             <div className="flex flex-col">
-              <h2 className="font-bold text-gray-800 text-sm sm:text-base">
-                {item.title}
-              </h2>
+              <h2 className="font-bold text-gray-800 text-sm sm:text-base">{item.title}</h2>
               <p className="text-gray-600 text-sm mb-1">{item.description}</p>
-              <p className="text-gray-700 text-sm">
-                ჯგუფის წონა: {item.annualGrowth}
-              </p>
-              <p className="text-gray-700 text-sm">
-                ფასის ცვლილება: {item.priceChange}
-              </p>
+              <p className="text-gray-700 text-sm">ჯგუფის წონა: {item.annualGrowth}</p>
+              <p className="text-gray-700 text-sm">ფასის ცვლილება: {item.priceChange}</p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Center Diagram */}
-      <div className="w-full sm:w-1/2 flex flex-col items-center justify-center bg-gray-100 rounded min-h-[400px] p-4">
-        <svg ref={svgRef}></svg>
+      <div className="w-full sm:w-1/2 flex flex-col items-center justify-center bg-gray-100 rounded min-h-[400px] p-4 max-w-full overflow-x-auto cursor-pointer">
+        <svg
+          ref={svgRef}
+          className="w-full max-w-[500px] h-auto"
+          viewBox="0 0 500 500"
+          preserveAspectRatio="xMidYMid meet"
+        ></svg>
 
-        {/* Color Legend */}
-        <div className="mt-6 flex flex-col items-center">
-          <div className="text-sm font-medium text-gray-700 mb-2">
+        <div className="mt-20 flex flex-col items-center w-full max-w-[320px]">
+          <div className="text-sm font-medium text-gray-700 mb-2 text-center">
             ფასების პროცენტული ცვლილება
           </div>
-          <div className="flex items-center">
-            <svg width="300" height="30">
-              <defs>
-                <linearGradient
-                  id="legendGradient"
-                  x1="0%"
-                  y1="0%"
-                  x2="100%"
-                  y2="0%"
-                >
-                  <stop offset="0%" stopColor="#5D4E75" />
-                  <stop offset="16.67%" stopColor="#7C6A96" />
-                  <stop offset="33.33%" stopColor="#A8A8C8" />
-                  <stop offset="50%" stopColor="#E0E0E0" />
-                  <stop offset="66.67%" stopColor="#FFCC80" />
-                  <stop offset="83.33%" stopColor="#FF9F43" />
-                  <stop offset="100%" stopColor="#E74C3C" />
-                </linearGradient>
-              </defs>
-              <rect
-                x="0"
-                y="5"
-                width="300"
-                height="20"
-                fill="url(#legendGradient)"
-                stroke="#999"
-                strokeWidth="1"
-              />
-            </svg>
-          </div>
-          <div className="flex justify-between w-[300px] mt-1 text-xs text-gray-600">
-            <span>-24</span>
-            <span>-12</span>
-            <span>-6</span>
-            <span>-2</span>
-            <span>0</span>
-            <span>2</span>
-            <span>6</span>
-            <span>12</span>
-            <span>24</span>
+          <div className="flex items-center justify-center flex-wrap gap-1">
+            {legendRanges.map((range, idx) => (
+              <div key={idx} className="flex flex-col items-center mx-1">
+                <div
+                  className="w-6 h-4"
+                  style={{
+                    backgroundColor: range.fill,
+                    opacity: range.fillOpacity,
+                    border: "1px solid #999",
+                  }}
+                ></div>
+                <span className="text-xs text-gray-600 mt-1">{range.value}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Right Section */}
       <div className="w-full sm:w-1/4 flex flex-col gap-4 font-bpg-nino">
         {categoriesRight.map((item, index) => (
-          <div
-            key={index}
-            className="flex items-start gap-3 p-3 bg-white shadow rounded"
-          >
-            {/* Icon */}
-            <img
-              src={item.icon}
-              alt="icon"
-              className="w-12 h-12 object-contain"
-            />
-            {/* Text Block */}
+          <div key={index} className="flex items-start gap-3 p-3 bg-white shadow rounded">
+            <img src={item.icon} alt="icon" className="w-12 h-12 object-contain" />
             <div className="flex flex-col">
-              <h2 className="font-bold text-gray-800 text-sm sm:text-base">
-                {item.title}
-              </h2>
+              <h2 className="font-bold text-gray-800 text-sm sm:text-base">{item.title}</h2>
               <p className="text-gray-600 text-sm mb-1">{item.description}</p>
-              <p className="text-gray-700 text-sm">
-                ჯგუფის წონა: {item.annualGrowth}
-              </p>
-              <p className="text-gray-700 text-sm">
-                ფასის ცვლილება: {item.priceChange}
-              </p>
+              <p className="text-gray-700 text-sm">ჯგუფის წონა: {item.annualGrowth}</p>
+              <p className="text-gray-700 text-sm">ფასის ცვლილება: {item.priceChange}</p>
             </div>
           </div>
         ))}
