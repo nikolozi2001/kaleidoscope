@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
-import Footer from "./components/Footer";
+import Footer from "./components/footer";
 import LeftPanel from "./components/LeftPanel";
 import RightPanel from "./components/RightPanel";
-// import chart from "./components/chart";
 import "./App.scss";
 
 function App() {

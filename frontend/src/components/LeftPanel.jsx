@@ -4,6 +4,7 @@ import imgskalk from "../assets/images/spi-kalkulatori.jpg";
 import basketImg from "../assets/images/bascket.svg";
 import pressImg from "../assets/images/icon.svg";
 import InfoModal from "./InfoModal";
+import axios from "axios";
 
 const months = {
   GE: [
@@ -53,16 +54,59 @@ const months = {
 const LeftPanel = ({ language }) => {
   const [year, setYear] = useState("2025");
   const [month, setMonth] = useState("");
-  const [compareTo, setCompareTo] = useState("prevMonth");
+  const [compareTo, setCompareTo] = useState("prevYear");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [resultText, setResultText] = useState("");
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     if (!month) return;
+
+    let calculated = null;
+
+    try {
+      if (compareTo === "prevMonth") {
+        // Current month data
+        const response = await axios.get(
+          `http://localhost:5000/api/groupindex/${year}/${month}/0/0`
+        );
+        const index_now = response.data[0].index;
+
+        // Previous month data
+        const month_old = month == 1 ? 12 : month - 1;
+        const year_old = month_old == 12 ? year - 1 : year;
+
+        const response2 = await axios.get(
+          `http://localhost:5000/api/groupindex/${year_old}/${month_old}/0/0`
+        );
+        const index_now2 = response2.data[0].index;
+
+        calculated = ((index_now / index_now2) * 100 - 100).toFixed(2);
+      }
+
+      if (compareTo === "prevYear") {
+        // Current month data
+        const response = await axios.get(
+          `http://localhost:5000/api/groupindex/${year}/${month}/0/0`
+        );
+        const index_now = response.data[0].index;
+
+        // Same logic but previous year and month - 1
+        const year_old = parseInt(year) - 1;
+        const month_old = parseInt(month);
+
+        const response2 = await axios.get(
+          `http://localhost:5000/api/groupindex/${year_old}/${month_old}/0/0`
+        );
+        const index_now2 = response2.data[0].index;
+
+        calculated = ((index_now / index_now2) * 100 - 100).toFixed(2);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
 
     const selectedMonthName =
       months[language === "GE" ? "GE" : "EN"][parseInt(month) - 1] || "";
-
     const selectedMonthNameLocative =
       months["GE_LOCATIVE"][parseInt(month) - 1] || "";
 
@@ -72,7 +116,7 @@ const LeftPanel = ({ language }) => {
           ? "წინა წლის შესაბამის თვესთან"
           : "წინა თვესთან";
       setResultText(
-        `${year} წლის ${selectedMonthNameLocative} ${comparison} ინდექსი გაიზარდა 0.43%`
+        `${year} წლის ${selectedMonthNameLocative} ინფლაციის დონემ ${comparison} შედარებით შეადგინა ${calculated}%`
       );
     } else {
       const comparison =
@@ -80,7 +124,7 @@ const LeftPanel = ({ language }) => {
           ? "compared to the same month last year"
           : "compared to previous month";
       setResultText(
-        `Index increased by 0.43% in ${selectedMonthName} ${year}, ${comparison}`
+        `In  ${selectedMonthName} ${year} the inflation rate  ${comparison}  amounted to ${calculated}%`
       );
     }
   };
@@ -138,7 +182,9 @@ const LeftPanel = ({ language }) => {
           onChange={(e) => setMonth(e.target.value)}
           className="border border-gray-300 rounded-md px-3 py-2 text-sm font-bpg-nino w-full"
         >
-          <option value="">{language === "GE" ? "თვე" : "Month"}</option>
+          <option value="" disabled>
+            {language === "GE" ? "თვე" : "Month"}
+          </option>
           {months[language === "GE" ? "GE" : "EN"].map((monthName, index) => (
             <option key={index} value={index + 1}>
               {monthName}
@@ -184,7 +230,6 @@ const LeftPanel = ({ language }) => {
       {/* Accordion-style buttons */}
       <div className="space-y-3">
         <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 hover:bg-[#0080be] hover:text-white cursor-pointer transition duration-200 text-sm sm:text-base rounded-md font-bpg-nino">
-          {/* Basket Icon */}
           <img
             src={basketImg}
             alt="Basket"
@@ -196,7 +241,6 @@ const LeftPanel = ({ language }) => {
         </button>
 
         <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 hover:bg-[#0080be] hover:text-white cursor-pointer transition duration-200 text-sm sm:text-base rounded-md font-bpg-nino">
-          {/* Press Icon */}
           <img src={pressImg} alt="Press" className="w-5 h-5 object-contain" />
           <span>{language === "GE" ? "პრეს რელიზი" : "Press Release"}</span>
         </button>
@@ -204,7 +248,6 @@ const LeftPanel = ({ language }) => {
 
       {/* Cards */}
       <div className="space-y-4">
-        {/* Card 1 */}
         <div className="w-full bg-[#e9e7e7] hover:bg-[#0080be] hover:text-white cursor-pointer transition duration-200 rounded-md overflow-hidden">
           <img src={imgs} alt="icon" className="w-full h-auto object-cover" />
           <a href="https://www.geostat.ge/personalinflation/" target="blank">
@@ -216,7 +259,6 @@ const LeftPanel = ({ language }) => {
           </a>
         </div>
 
-        {/* Card 2 */}
         <div className="w-full bg-[#e9e7e7] hover:bg-[#0080be] hover:text-white cursor-pointer transition duration-200 rounded-md overflow-hidden">
           <img
             src={imgskalk}

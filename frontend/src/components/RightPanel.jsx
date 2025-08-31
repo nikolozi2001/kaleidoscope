@@ -16,21 +16,21 @@ import imgs11 from "../assets/images/hotel.png";
 import imgs12 from "../assets/images/goods.png";
 
 const categoriesLeft = [
-  { icon: imgs1, title: "სურსათი და უალკოჰოლო სასმელები", description: "სურსათი, უალკოჰოლო სასმელები", annualGrowth: "40.08%", priceChange: "3.72%" },
-  { icon: imgs2, title: "ალკოჰოლური სასმელები, თამბაქო", description: "ალკოჰოლური სასმელები, თამბაქოს ნაწარმი", annualGrowth: "2.88%", priceChange: "5.79%" },
-  { icon: imgs3, title: "ტანსაცმელი და ფეხსაცმელი", description: "ტანსაცმელი და ფეხსაცმელი", annualGrowth: "4.34%", priceChange: "-9.02%" },
-  { icon: imgs4, title: "საყოფაცხოვრებო ნივთები, ავეჯი და სახლის მოვლა", description: "საყოფაცხოვრებო ნივთები, ავეჯი, საოჯახო ტექნიკა, სახლის მოვლა", annualGrowth: "13.87%", priceChange: "0.52%" },
-  { icon: imgs5, title: "კომუნალური მომსახურება, წყალმომარაგება, გაზი და საწვავი", description: "ელექტროენერგია, ბუნებრივი გაზი, საწვავი; წყალმომარაგება, სანიტარული მომსახურება", annualGrowth: "3.56%", priceChange: "-2.42%" },
-  { icon: imgs6, title: "ჯანმრთელობის დაცვა", description: "ჯანმრთელობის მომსახურება, სამედიცინო პროდუქცია", annualGrowth: "8.95%", priceChange: "0.29%" }
+  { code: "1", icon: imgs1, title: "სურსათი და უალკოჰოლო სასმელები", description: "სურსათი, უალკოჰოლო სასმელები", annualGrowth: "40.08%", priceChange: "3.72%" },
+  { code: "2", icon: imgs2, title: "ალკოჰოლური სასმელები, თამბაქო", description: "ალკოჰოლური სასმელები, თამბაქოს ნაწარმი", annualGrowth: "2.88%", priceChange: "5.79%" },
+  { code: "3", icon: imgs3, title: "ტანსაცმელი და ფეხსაცმელი", description: "ტანსაცმელი და ფეხსაცმელი", annualGrowth: "4.34%", priceChange: "-9.02%" },
+  { code: "4", icon: imgs4, title: "საყოფაცხოვრებო ნივთები, ავეჯი და სახლის მოვლა", description: "საყოფაცხოვრებო ნივთები, ავეჯი, საოჯახო ტექნიკა, სახლის მოვლა", annualGrowth: "13.87%", priceChange: "0.52%" },
+  { code: "5", icon: imgs5, title: "კომუნალური მომსახურება, წყალმომარაგება, გაზი და საწვავი", description: "ელექტროენერგია, ბუნებრივი გაზი, საწვავი; წყალმომარაგება, სანიტარული მომსახურება", annualGrowth: "3.56%", priceChange: "-2.42%" },
+  { code: "6", icon: imgs6, title: "ჯანმრთელობის დაცვა", description: "ჯანმრთელობის მომსახურება, სამედიცინო პროდუქცია", annualGrowth: "8.95%", priceChange: "0.29%" }
 ];
 
 const categoriesRight = [
-  { icon: imgs7, title: "ტრანსპორტი", description: "სატრანსპორტო საშუალებების შეძენა და ექსპლუატაცია; სატრანსპორტო მომსახურება", annualGrowth: "10.44%", priceChange: "12.78%" },
-  { icon: imgs8, title: "კომუნიკაციები", description: "საკომუნიკაციო მომსახურება და ტელეფონები", annualGrowth: "4.24%", priceChange: "0.29%" },
-  { icon: imgs9, title: "დასვენება, გართობა და კულტურა", description: "დასვენება, კულტურული და გართობის მომსახურება", annualGrowth: "2.21%", priceChange: "-1.01%" },
-  { icon: imgs10, title: "განათლება", description: "სასწავლო დაწესებულებების საფასური", annualGrowth: "5.16%", priceChange: "4.30%" },
-  { icon: imgs11, title: "სასტუმროები, კაფეები და რესტორნები", description: "სასტუმროები, კაფეები და რესტორნები", annualGrowth: "1.81%", priceChange: "1.19%" },
-  { icon: imgs12, title: "სხვა სახის საქონელი და მომსახურება", description: "პერსონალური საქონელი, დაზღვევა, ფინანსური მომსახურება", annualGrowth: "2.34%", priceChange: "0.78%" }
+  { code: "7", icon: imgs7, title: "ტრანსპორტი", description: "სატრანსპორტო საშუალებების შეძენა და ექსპლუატაცია; სატრანსპორტო მომსახურება", annualGrowth: "10.44%", priceChange: "12.78%" },
+  { code: "8", icon: imgs8, title: "კომუნიკაციები", description: "საკომუნიკაციო მომსახურება და ტელეფონები", annualGrowth: "4.24%", priceChange: "0.29%" },
+  { code: "9", icon: imgs9, title: "დასვენება, გართობა და კულტურა", description: "დასვენება, კულტურული და გართობის მომსახურება", annualGrowth: "2.21%", priceChange: "-1.01%" },
+  { code: "10", icon: imgs10, title: "განათლება", description: "სასწავლო დაწესებულებების საფასური", annualGrowth: "5.16%", priceChange: "4.30%" },
+  { code: "11", icon: imgs11, title: "სასტუმროები, კაფეები და რესტორნები", description: "სასტუმროები, კაფეები და რესტორნები", annualGrowth: "1.81%", priceChange: "1.19%" },
+  { code: "12", icon: imgs12, title: "სხვა სახის საქონელი და მომსახურება", description: "პერსონალური საქონელი, დაზღვევა, ფინანსური მომსახურება", annualGrowth: "2.34%", priceChange: "0.78%" }
 ];
 
 const legendRanges = [
@@ -58,25 +58,51 @@ const getColorForValue = (value) => {
 };
 
 const data = [
-  { name: "სურსათი", value: -21.1, secondValue: 31.72 },
-  { name: "უალკოჰოლო სასმელები", value: 3.72, secondValue: 5.0 },
-  { name: "თამბაქო", value: 2.88, secondValue: 4.0 },
-  { name: "ტანსაცმელი", value: 5.79, secondValue: 6.5 },
-  { name: "ფეხსაცმელი", value: 4.34, secondValue: 5.2 },
-  { name: "ალკოჰოლი1", value: 9.02, secondValue: 10.0 },
-  { name: "ალკოჰოლი2", value: 13.87, secondValue: 15.0 },
-  { name: "ალკოჰოლი3", value: 3.56, secondValue: 4.2 },
-  { name: "ალკოჰოლი4", value: 2.42, secondValue: 3.1 },
-  { name: "ალკოჰოლი5", value: 0.29, secondValue: 0.5 },
-  { name: "ალკოჰოლი6", value: -1.01, secondValue: 25.0 },
-  { name: "ალკოჰოლი6", value: 2.34, secondValue: 25.0 },
-  { name: "ალკოჰოლი6", value: 8.95, secondValue: 25.0 },
-  { name: "ალკოჰოლი6", value: -9.02, secondValue: 25.0 },
-  { name: "ალკოჰოლი6", value: 13.87, secondValue: 25.0 },
-  { name: "ალკოჰოლი6", value: 3.56, secondValue: 25.0 },
-  { name: "ალკოჰოლი6", value: 2.21, secondValue: 25.0 },
-  { name: "ალკოჰოლი7", value: 4.24, secondValue: 60.0 }
+  { code: 1, name: "სურსათი", value: 10.39, secondValue: 31.72 },
+  { code: 1, name: "უალკოჰოლო სასმელები", value: 10.79, secondValue: 2.75 },
+  { code: 2, name: "ალკოჰოლური სასმელები", value: 2.88, secondValue: 3.11 },
+  { code: 2, name: "თამბაქოს ნაწარმი", value: 5.79, secondValue: 3.31 },
+  { code: 3, name: "ტანსაცმელი", value: -1.92, secondValue: 3.10 },
+  { code: 3, name: "ფეხსაცმელი", value: -3.08, secondValue: 1.62 },
+  { code: 4, name: "ფაქტიური გადასახადი საცხოვრებელზე", value: 3.56, secondValue: 2.48 },
+  { code: 4, name: "დარიცხული ბინის გადასახადი", value: 0, secondValue: 0 },
+  { code: 4, name: "საცხოვრებლის მიმდინარე მოვლა და შეკეთება", value: 2.42, secondValue: 0.96 },
+  { code: 4, name: "წყალმომარაგება და საცხოვრებელთან დაკავშირებული სხვა მომსახურება", value: 0.29, secondValue: 1.00 },
+  { code: 4, name: "ელექტროენერგია, აირი და სათბობის სხვა სახეები", value: 13.87, secondValue: 5.39 },
+  { code: 5, name: "ავეჯი, საოჯახო ნივთები, ხალიჩები და სხვა იატაკის საფარი და რემონტი", value: 2.34, secondValue: 0.65 },
+  { code: 5, name: "საოჯახო საფეიქრო ნაწარმი", value: 8.95, secondValue: 0.08 },
+  { code: 5, name: "გამათბობელი და საჭმლის მოსამზადებელი მოწყობილობა, მაცივრები, საყინულეები, სარეცხი მანქანები და სხვა საყოფაცხოვრებო საგნები, დაყენებისა და რემონტის ჩათვლით", value: -9.02, secondValue: 1.08 },
+  { code: 5, name: "მინის ჭურჭელი, მაგიდის და საოჯახო ჭურჭელი", value: 13.87, secondValue: 0.93 },
+  { code: 5, name: "ინსტრუმენტები, მოწყობილობა და ტექნიკა სახლისა და ბაღისთვის", value: 3.56, secondValue: 0.05 },
+  { code: 5, name: "ყოველდღიური საყოფაცხოვრებო საჭიროების საქონელი და მომსახურება", value: -1.01, secondValue: 1.03 },
+  { code: 6, name: "სამედიცინო პროდუქცია, აპარატურა და მოწყობილობა", value: 4, secondValue: 4.57 },
+  { code: 6, name: "ამბულატორიული სამედიცინო მომსახურება", value: 12, secondValue: 2.04 },
+  { code: 6, name: "საავადმყოფოების მომსახურება", value: 14, secondValue: 1.45 },
+  { code: 7, name: "სატრანსპორტო საშუალებების შეძენა", value: 17, secondValue: 0.51 },
+  { code: 7, name: "პირადი სატრანსპორტო საშუალებების ექსპლოატაცია", value: 4.24, secondValue: 26.94 },
+  { code: 7, name: "სატრანსპორტო მომსახურება", value: 4.24, secondValue: 5.94 },
+  { code: 8, name: "საფოსტო მომსახურება", value: 4.24, secondValue: 4.91 },
+  { code: 8, name: "სატელეფონო და სატელეფაქსო მოწყობილობები", value: 4.24, secondValue: 5.68 },
+  { code: 8, name: "სატელეფონო, სატელეგრაფო და სატელეფაქსო მომსახურება", value: 4.24, secondValue: 5.42 },
+  { code: 9, name: "აუდიო ვიზუალური, ფოტოგრაფიული და მონაცემთა დამუშავების მოწყობილობები, რემონტის ჩათვლით", value: 4.24, secondValue: 4.64 },
+  { code: 9, name: "დასვენების, გართობისა და კულტურის ხანგრძლივი მოხმარების სხვა საქონელი", value: 4.24, secondValue: 4.39 },
+  { code: 9, name: "დასვენებისა და გართობისათვის აუცილებელი სხვა მოწყობილობა; ბაღები, ყვავილები და შინაური ცხოველები", value: 4.24, secondValue: 4.13 },
+  { code: 9, name: "გასართობი და კულტურული მომსახურება", value: 4.24, secondValue: 4.13 },
+  { code: 9,name: "წიგნები, გაზეთები და საკანცელარიო ნივთები", value: 4.24, secondValue: 3.87 },
+  { code: 9, name: "ტურისტული მოგზაურობა", value: 4.24, secondValue: 3.35 },
+  { code: 10, name: "სკოლამდელი და დაწყებითი განათლება", value: 4.24, secondValue: 3.10 },
+  { code: 10, name: "საშუალო განათლება", value: 4.24, secondValue: 2.84 },
+  { code: 10, name: "უმაღლესი განათლება", value: 4.24, secondValue: 2.32 },
+  { code: 10, name: "დონით განუსაზღვრელი განათლება", value: 4.24, secondValue: 2.06 },
+  { code: 11, name: "საზოგადოებრივი კვება", value: 4.24, secondValue: 1.81 },
+  { code: 11, name: "ღამის გასათევით მომსახურება", value: 4.24, secondValue: 1.29 },
+  { code: 12, name: "პირადი ჰიგიენა", value: 4.24, secondValue: 1.55 },
+  { code: 12, name: "პირადი ნივთები, სხვა კატეგორიებში ჩაურთველი", value: 4.24, secondValue: 1.03 },
+  { code: 12, name: "დაზღვევა", value: 4.24, secondValue: 0.77 },
+  { code: 12, name: "საფინანსო მომსახურება", value: 4.24, secondValue: 0.26 },
+  { code: 12, name: "სხვა სახის მომსახურება", value: 4.24, secondValue: 0.51 }
 ];
+
 
 const RightPanel = () => {
   const svgRef = useRef();
@@ -89,10 +115,20 @@ const RightPanel = () => {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const points = d3.range(data.length).map(() => {
-      const angle = Math.random() * 2 * Math.PI;
-      const r = Math.random() * radius * 0.9;
-      return [width / 2 + r * Math.cos(angle), height / 2 + r * Math.sin(angle)];
+    // Scale distance from center based on secondValue
+    const secondValueScale = d3.scaleLinear()
+      .domain([0, d3.max(data, d => d.secondValue)])
+      .range([radius * 0.2, radius * 0.9]);
+
+    // evenly distribute points around a circle
+    const angleStep = (2 * Math.PI) / data.length;
+    const points = data.map((d, i) => {
+      const angle = i * angleStep;
+      const r = secondValueScale(d.secondValue);
+      return [
+        width / 2 + r * Math.cos(angle),
+        height / 2 + r * Math.sin(angle)
+      ];
     });
 
     const delaunay = Delaunay.from(points);
@@ -119,7 +155,7 @@ const RightPanel = () => {
       .attr("stroke", "grey")
       .attr("stroke-width", 21);
 
-      svg
+    svg
       .append("circle")
       .attr("cx", width / 2)
       .attr("cy", height / 2)
@@ -154,8 +190,8 @@ const RightPanel = () => {
         .attr("fill-opacity", fillOpacity)
         .attr("stroke", "#fff")
         .attr("stroke-width", () => {
-          const val = Math.abs(data[i].value);
-          return minStroke + (val / maxValue) * (maxStroke - minStroke);
+          const val = Math.abs(data[i].secondValue);
+          return minStroke + (val / d3.max(data, d => d.secondValue)) * (maxStroke - minStroke);
         })
         .attr("opacity", 0.9)
         .style("filter", "url(#drop-shadow)")
