@@ -113,11 +113,17 @@ const LeftPanel = ({ language }) => {
     }
 
     const level = 1;
+
     const response = await axios.get(
       `http://localhost:5000/api/groupweight/${year}/${level}`
     );
     const data = response.data;
+
+    // Save in localStorage
     localStorage.setItem("result", JSON.stringify(data));
+
+    // Also update state (if you need it immediately in the UI)
+    window.dispatchEvent(new Event("storage")); // notify other components
 
     const selectedMonthName =
       months[language === "GE" ? "GE" : "EN"][parseInt(month) - 1] || "";

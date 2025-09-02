@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { Delaunay } from "d3-delaunay";
 
@@ -14,58 +14,6 @@ import imgs9 from "../assets/images/vacation.png";
 import imgs10 from "../assets/images/education.png";
 import imgs11 from "../assets/images/hotel.png";
 import imgs12 from "../assets/images/goods.png";
-
-const categoriesLeft = [
-  {
-    code: "1",
-    icon: imgs1,
-    title: "სურსათი და უალკოჰოლო სასმელები",
-    description: "სურსათი, უალკოჰოლო სასმელები",
-    annualGrowth: parsed[0].weight,
-    priceChange: "3.72%",
-  },
-  {
-    code: "2",
-    icon: imgs2,
-    title: "ალკოჰოლური სასმელები, თამბაქო",
-    description: "ალკოჰოლური სასმელები, თამბაქოს ნაწარმი",
-    annualGrowth: "2.88%",
-    priceChange: "5.79%",
-  },
-  {
-    code: "3",
-    icon: imgs3,
-    title: "ტანსაცმელი და ფეხსაცმელი",
-    description: "ტანსაცმელი და ფეხსაცმელი",
-    annualGrowth: "4.34%",
-    priceChange: "-9.02%",
-  },
-  {
-    code: "4",
-    icon: imgs4,
-    title: "საყოფაცხოვრებო ნივთები, ავეჯი და სახლის მოვლა",
-    description: "საყოფაცხოვრებო ნივთები, ავეჯი, საოჯახო ტექნიკა, სახლის მოვლა",
-    annualGrowth: "13.87%",
-    priceChange: "0.52%",
-  },
-  {
-    code: "5",
-    icon: imgs5,
-    title: "კომუნალური მომსახურება, წყალმომარაგება, გაზი და საწვავი",
-    description:
-      "ელექტროენერგია, ბუნებრივი გაზი, საწვავი; წყალმომარაგება, სანიტარული მომსახურება",
-    annualGrowth: "3.56%",
-    priceChange: "-2.42%",
-  },
-  {
-    code: "6",
-    icon: imgs6,
-    title: "ჯანმრთელობის დაცვა",
-    description: "ჯანმრთელობის მომსახურება, სამედიცინო პროდუქცია",
-    annualGrowth: "8.95%",
-    priceChange: "0.29%",
-  },
-];
 
 const categoriesRight = [
   {
@@ -315,13 +263,104 @@ const data = [
 ];
 
 const RightPanel = () => {
-  const svgRef = useRef();
+  const [parsed, setParsed] = useState([]);
 
-  const saved = localStorage.getItem("result");
-  if (saved) {
-    const parsed = JSON.parse(saved);
-    console.log(parsed[0].weight);
-  }
+  // Load data on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("result");
+    if (saved) {
+      try {
+        setParsed(JSON.parse(saved));
+      } catch (err) {
+        console.error("Error parsing localStorage result:", err);
+      }
+    }
+
+    // Listen for changes to localStorage
+    const handleStorageChange = () => {
+      const updated = localStorage.getItem("result");
+      if (updated) setParsed(JSON.parse(updated));
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  let cl1 = parsed[0]?.weight;
+  cl1 = cl1 ? `${Number(cl1).toFixed(2)}%` : "N/A";
+
+  let cl2 = parsed[1]?.weight;
+  cl2 = cl2 ? `${Number(cl2).toFixed(2)}%` : "N/A";
+
+  let cl3 = parsed[2]?.weight;
+  cl3 = cl3 ? `${Number(cl3).toFixed(2)}%` : "N/A";
+
+  let cl4 = parsed[3]?.weight;
+  cl4 = cl4 ? `${Number(cl4).toFixed(2)}%` : "N/A";
+
+  let cl5 = parsed[4]?.weight;
+  cl5 = cl5 ? `${Number(cl5).toFixed(2)}%` : "N/A";
+
+  let cl6 = parsed[5]?.weight;
+  cl6 = cl6 ? `${Number(cl6).toFixed(2)}%` : "N/A";
+
+  const categoriesLeft = [
+    {
+      code: "1",
+      icon: imgs1,
+      title: "სურსათი და უალკოჰოლო სასმელები",
+      description: "სურსათი, უალკოჰოლო სასმელები",
+      annualGrowth: cl1,
+      priceChange: "3.72%",
+    },
+    {
+      code: "2",
+      icon: imgs2,
+      title: "ალკოჰოლური სასმელები, თამბაქო",
+      description: "ალკოჰოლური სასმელები, თამბაქოს ნაწარმი",
+      annualGrowth: cl2,
+      priceChange: "5.79%",
+    },
+    {
+      code: "3",
+      icon: imgs3,
+      title: "ტანსაცმელი და ფეხსაცმელი",
+      description: "ტანსაცმელი და ფეხსაცმელი",
+      annualGrowth: cl3,
+      priceChange: "-9.02%",
+    },
+    {
+      code: "4",
+      icon: imgs4,
+      title: "საყოფაცხოვრებო ნივთები, ავეჯი და სახლის მოვლა",
+      description:
+        "საყოფაცხოვრებო ნივთები, ავეჯი, საოჯახო ტექნიკა, სახლის მოვლა",
+      annualGrowth: cl4,
+      priceChange: "0.52%",
+    },
+    {
+      code: "5",
+      icon: imgs5,
+      title: "კომუნალური მომსახურება, წყალმომარაგება, გაზი და საწვავი",
+      description:
+        "ელექტროენერგია, ბუნებრივი გაზი, საწვავი; წყალმომარაგება, სანიტარული მომსახურება",
+      annualGrowth: cl5,
+      priceChange: "-2.42%",
+    },
+    {
+      code: "6",
+      icon: imgs6,
+      title: "ჯანმრთელობის დაცვა",
+      description: "ჯანმრთელობის მომსახურება, სამედიცინო პროდუქცია",
+      annualGrowth: cl6,
+      priceChange: "0.29%",
+    },
+  ];
+
+  const svgRef = useRef();
 
   useEffect(() => {
     const width = 500;
