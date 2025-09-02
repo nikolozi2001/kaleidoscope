@@ -290,22 +290,22 @@ const RightPanel = () => {
   }, []);
 
   let cl1 = parsed[0]?.weight;
-  cl1 = cl1 ? `${Number(cl1).toFixed(2)}%` : "N/A";
+  cl1 = cl1 ? `${(Number(cl1) * 100).toFixed(2)}%` : "N/A";
 
   let cl2 = parsed[1]?.weight;
-  cl2 = cl2 ? `${Number(cl2).toFixed(2)}%` : "N/A";
+  cl2 = cl2 ? `${(Number(cl2) * 100).toFixed(2)}%` : "N/A";
 
   let cl3 = parsed[2]?.weight;
-  cl3 = cl3 ? `${Number(cl3).toFixed(2)}%` : "N/A";
+  cl3 = cl3 ? `${(Number(cl3) * 100).toFixed(2)}%` : "N/A";
 
   let cl4 = parsed[3]?.weight;
-  cl4 = cl4 ? `${Number(cl4).toFixed(2)}%` : "N/A";
+  cl4 = cl4 ? `${(Number(cl4) * 100).toFixed(2)}%` : "N/A";
 
   let cl5 = parsed[4]?.weight;
-  cl5 = cl5 ? `${Number(cl5).toFixed(2)}%` : "N/A";
+  cl5 = cl5 ? `${(Number(cl5) * 100).toFixed(2)}%` : "N/A";
 
   let cl6 = parsed[5]?.weight;
-  cl6 = cl6 ? `${Number(cl6).toFixed(2)}%` : "N/A";
+  cl6 = cl6 ? `${(Number(cl6) * 100).toFixed(2)}%` : "N/A";
 
   const categoriesLeft = [
     {
