@@ -15,58 +15,6 @@ import imgs10 from "../assets/images/education.png";
 import imgs11 from "../assets/images/hotel.png";
 import imgs12 from "../assets/images/goods.png";
 
-const categoriesRight = [
-  {
-    code: "7",
-    icon: imgs7,
-    title: "ტრანსპორტი",
-    description:
-      "სატრანსპორტო საშუალებების შეძენა და ექსპლუატაცია; სატრანსპორტო მომსახურება",
-    annualGrowth: "10.44%",
-    priceChange: "12.78%",
-  },
-  {
-    code: "8",
-    icon: imgs8,
-    title: "კომუნიკაციები",
-    description: "საკომუნიკაციო მომსახურება და ტელეფონები",
-    annualGrowth: "4.24%",
-    priceChange: "0.29%",
-  },
-  {
-    code: "9",
-    icon: imgs9,
-    title: "დასვენება, გართობა და კულტურა",
-    description: "დასვენება, კულტურული და გართობის მომსახურება",
-    annualGrowth: "2.21%",
-    priceChange: "-1.01%",
-  },
-  {
-    code: "10",
-    icon: imgs10,
-    title: "განათლება",
-    description: "სასწავლო დაწესებულებების საფასური",
-    annualGrowth: "5.16%",
-    priceChange: "4.30%",
-  },
-  {
-    code: "11",
-    icon: imgs11,
-    title: "სასტუმროები, კაფეები და რესტორნები",
-    description: "სასტუმროები, კაფეები და რესტორნები",
-    annualGrowth: "1.81%",
-    priceChange: "1.19%",
-  },
-  {
-    code: "12",
-    icon: imgs12,
-    title: "სხვა სახის საქონელი და მომსახურება",
-    description: "პერსონალური საქონელი, დაზღვევა, ფინანსური მომსახურება",
-    annualGrowth: "2.34%",
-    priceChange: "0.78%",
-  },
-];
-
 const legendRanges = [
   { value: -24, fill: "rgb(51, 51, 102)", fillOpacity: 0.7 },
   { value: -12, fill: "rgb(51, 102, 204)", fillOpacity: 0.7 },
@@ -357,6 +305,76 @@ const RightPanel = () => {
       description: "ჯანმრთელობის მომსახურება, სამედიცინო პროდუქცია",
       annualGrowth: cl6,
       priceChange: "0.29%",
+    },
+  ];
+
+  let cr7 = parsed[6]?.weight;
+  cr7 = cr7 ? `${(Number(cr7) * 100).toFixed(2)}%` : "N/A";
+
+  let cr8 = parsed[7]?.weight;
+  cr8 = cr8 ? `${(Number(cr8) * 100).toFixed(2)}%` : "N/A";
+
+  let cr9 = parsed[8]?.weight;
+  cr9 = cr9 ? `${(Number(cr9) * 100).toFixed(2)}%` : "N/A";
+
+  let cr10 = parsed[9]?.weight;
+  cr10 = cr10 ? `${(Number(cr10) * 100).toFixed(2)}%` : "N/A";
+
+  let cr11 = parsed[10]?.weight;
+  cr11 = cr11 ? `${(Number(cr11) * 100).toFixed(2)}%` : "N/A";
+
+  let cr12 = parsed[11]?.weight;
+  cr12 = cr12 ? `${(Number(cr12) * 100).toFixed(2)}%` : "N/A";
+
+  const categoriesRight = [
+    {
+      code: "7",
+      icon: imgs7,
+      title: "ტრანსპორტი",
+      description:
+        "სატრანსპორტო საშუალებების შეძენა და ექსპლუატაცია; სატრანსპორტო მომსახურება",
+      annualGrowth: cr7,
+      priceChange: "12.78%",
+    },
+    {
+      code: "8",
+      icon: imgs8,
+      title: "კომუნიკაციები",
+      description: "საკომუნიკაციო მომსახურება და ტელეფონები",
+      annualGrowth: cr8,
+      priceChange: "0.29%",
+    },
+    {
+      code: "9",
+      icon: imgs9,
+      title: "დასვენება, გართობა და კულტურა",
+      description: "დასვენება, კულტურული და გართობის მომსახურება",
+      annualGrowth: cr9,
+      priceChange: "-1.01%",
+    },
+    {
+      code: "10",
+      icon: imgs10,
+      title: "განათლება",
+      description: "სასწავლო დაწესებულებების საფასური",
+      annualGrowth: cr10,
+      priceChange: "4.30%",
+    },
+    {
+      code: "11",
+      icon: imgs11,
+      title: "სასტუმროები, კაფეები და რესტორნები",
+      description: "სასტუმროები, კაფეები და რესტორნები",
+      annualGrowth: cr11,
+      priceChange: "1.19%",
+    },
+    {
+      code: "12",
+      icon: imgs12,
+      title: "სხვა სახის საქონელი და მომსახურება",
+      description: "პერსონალური საქონელი, დაზღვევა, ფინანსური მომსახურება",
+      annualGrowth: cr12,
+      priceChange: "0.78%",
     },
   ];
 
