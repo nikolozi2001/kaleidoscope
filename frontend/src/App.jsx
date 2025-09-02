@@ -11,12 +11,6 @@ import axios from "axios"; // since you use it
 function App() {
   const [language, setLanguage] = useState("GE");
 
-  // 👉 move your calculation function here
-  const handleCalculate = async () => {
-    // paste your big calculation logic here
-    console.log("Running calculation...");
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header language={language} setLanguage={setLanguage} />
@@ -29,15 +23,7 @@ function App() {
         <main className="flex-grow flex flex-col">
           <Routes>
             {/* pass the function to RightPanel */}
-            <Route
-              path="/"
-              element={
-                <RightPanel
-                  handleCalculate={handleCalculate}
-                  language={language}
-                />
-              }
-            />
+            <Route path="/" element={<RightPanel language={language} />} />
           </Routes>
         </main>
       </div>

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { Delaunay } from "d3-delaunay";
-import LeftPanel from "./LeftPanel";
 
 import imgs1 from "../assets/images/food.png";
 import imgs2 from "../assets/images/alcohol.png";
@@ -22,7 +21,7 @@ const categoriesLeft = [
     icon: imgs1,
     title: "სურსათი და უალკოჰოლო სასმელები",
     description: "სურსათი, უალკოჰოლო სასმელები",
-    annualGrowth: "40.08%",
+    annualGrowth: parsed[0].weight,
     priceChange: "3.72%",
   },
   {
@@ -315,10 +314,14 @@ const data = [
   { code: 12, name: "სხვა სახის მომსახურება", value: 4.24, secondValue: 0.51 },
 ];
 
-const RightPanel = ({ handleCalculate }) => {
+const RightPanel = () => {
   const svgRef = useRef();
 
-  console.log(handleCalculate(), "handleCalculate");
+  const saved = localStorage.getItem("result");
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    console.log(parsed[0].weight);
+  }
 
   useEffect(() => {
     const width = 500;

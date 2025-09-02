@@ -117,7 +117,7 @@ const LeftPanel = ({ language }) => {
       `http://localhost:5000/api/groupweight/${year}/${level}`
     );
     const data = response.data;
-    console.log(data);
+    localStorage.setItem("result", JSON.stringify(data));
 
     const selectedMonthName =
       months[language === "GE" ? "GE" : "EN"][parseInt(month) - 1] || "";
