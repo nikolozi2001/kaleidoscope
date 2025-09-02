@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import imgs from "../assets/images/personaluri-inplacia.png";
 import imgskalk from "../assets/images/spi-kalkulatori.jpg";
 import basketImg from "../assets/images/bascket.svg";
@@ -52,8 +52,13 @@ const months = {
 };
 
 const LeftPanel = ({ language }) => {
-  const [year, setYear] = useState("2025");
-  const [month, setMonth] = useState("");
+  const today = new Date();
+  const prevMonth = today.getMonth() === 0 ? 12 : today.getMonth(); // 1–12
+  const prevMonthYear =
+    today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
+
+  const [year, setYear] = useState(prevMonthYear.toString());
+  const [month, setMonth] = useState(prevMonth.toString());
   const [compareTo, setCompareTo] = useState("prevYear");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [resultText, setResultText] = useState("");
@@ -65,13 +70,11 @@ const LeftPanel = ({ language }) => {
 
     try {
       if (compareTo === "prevMonth") {
-        // Current month data
         const response = await axios.get(
           `http://localhost:5000/api/groupindex/${year}/${month}/0/0`
         );
         const index_now = response.data[0].index;
 
-        // Previous month data
         const month_old = month == 1 ? 12 : month - 1;
         const year_old = month_old == 12 ? year - 1 : year;
 
@@ -84,13 +87,11 @@ const LeftPanel = ({ language }) => {
       }
 
       if (compareTo === "prevYear") {
-        // Current month data
         const response = await axios.get(
           `http://localhost:5000/api/groupindex/${year}/${month}/0/0`
         );
         const index_now = response.data[0].index;
 
-        // Same logic but previous year and month - 1
         const year_old = parseInt(year) - 1;
         const month_old = parseInt(month);
 
@@ -103,7 +104,20 @@ const LeftPanel = ({ language }) => {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
+      setResultText(
+        language === "GE"
+          ? "დაფიქსირდა შეცდომა მონაცემების მიღებისას"
+          : "Error fetching data"
+      );
+      return;
     }
+
+    const level = 1;
+    const response = await axios.get(
+      `http://localhost:5000/api/groupweight/${year}/${level}`
+    );
+    const data = response.data;
+    console.log(data);
 
     const selectedMonthName =
       months[language === "GE" ? "GE" : "EN"][parseInt(month) - 1] || "";
@@ -124,10 +138,16 @@ const LeftPanel = ({ language }) => {
           ? "compared to the same month last year"
           : "compared to previous month";
       setResultText(
-        `In  ${selectedMonthName} ${year} the inflation rate  ${comparison}  amounted to ${calculated}%`
+        `In ${selectedMonthName} ${year} the inflation rate ${comparison} amounted to ${calculated}%`
       );
     }
   };
+
+  // Run calculation only on first mount
+  useEffect(() => {
+    handleCalculate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // empty dependency array ensures it runs only once
 
   return (
     <div className="w-full px-4 py-6 space-y-6">
@@ -136,7 +156,7 @@ const LeftPanel = ({ language }) => {
         <h1 className="text-lg sm:text-xl text-gray-800 font-bpg-nino text-center">
           {language === "GE"
             ? "გაანგარიშების ინსტრუქცია"
-            : "CALCULATION INSTRUCTION "}
+            : "CALCULATION INSTRUCTION"}
         </h1>
         <button
           onClick={() => setIsModalOpen(true)}
@@ -250,7 +270,7 @@ const LeftPanel = ({ language }) => {
       <div className="space-y-4">
         <div className="w-full bg-[#e9e7e7] hover:bg-[#0080be] hover:text-white cursor-pointer transition duration-200 rounded-md overflow-hidden">
           <img src={imgs} alt="icon" className="w-full h-auto object-cover" />
-          <a href="https://www.geostat.ge/personalinflation/" target="blank">
+          <a href="https://www.geostat.ge/personalinflation/" target="_blank">
             <p className="text-center text-sm sm:text-base py-3 font-bpg-nino">
               {language === "GE"
                 ? "პერსონალური ინფლაციის კალკულატორი"
@@ -265,7 +285,7 @@ const LeftPanel = ({ language }) => {
             alt="icon"
             className="w-full h-auto object-cover"
           />
-          <a href="https://www.geostat.ge/cpi/" target="blank">
+          <a href="https://www.geostat.ge/cpi/" target="_blank">
             <p className="text-center text-sm sm:text-base py-3 font-bpg-nino">
               {language === "GE" ? "სფი კალკულატორი" : "CPI CALCULATOR"}
             </p>
