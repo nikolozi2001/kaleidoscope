@@ -212,6 +212,7 @@ const data = [
 
 const RightPanel = () => {
   const [parsed, setParsed] = useState([]);
+  const [parsed2, setParsed2] = useState([]);
 
   // Load data on mount
   useEffect(() => {
@@ -224,10 +225,22 @@ const RightPanel = () => {
       }
     }
 
+    const saved2 = localStorage.getItem("groupindex_pricechanges");
+    if (saved2) {
+      try {
+        setParsed2(JSON.parse(saved2));
+      } catch (err) {
+        console.error("Error parsing localStorage result:", err);
+      }
+    }
+
     // Listen for changes to localStorage
     const handleStorageChange = () => {
       const updated = localStorage.getItem("result");
       if (updated) setParsed(JSON.parse(updated));
+
+      const updated2 = localStorage.getItem("groupindex_pricechanges");
+      if (updated2) setParsed2(JSON.parse(updated2));
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -236,6 +249,8 @@ const RightPanel = () => {
       window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
+
+  console.log("parsed2", parsed2);
 
   let cl1 = parsed[0]?.weight;
   cl1 = cl1 ? `${(Number(cl1) * 100).toFixed(2)}%` : "N/A";
@@ -262,7 +277,6 @@ const RightPanel = () => {
       title: "სურსათი და უალკოჰოლო სასმელები",
       description: "სურსათი, უალკოჰოლო სასმელები",
       annualGrowth: cl1,
-      priceChange: "3.72%",
     },
     {
       code: "2",
@@ -270,7 +284,6 @@ const RightPanel = () => {
       title: "ალკოჰოლური სასმელები, თამბაქო",
       description: "ალკოჰოლური სასმელები, თამბაქოს ნაწარმი",
       annualGrowth: cl2,
-      priceChange: "5.79%",
     },
     {
       code: "3",
@@ -278,7 +291,6 @@ const RightPanel = () => {
       title: "ტანსაცმელი და ფეხსაცმელი",
       description: "ტანსაცმელი და ფეხსაცმელი",
       annualGrowth: cl3,
-      priceChange: "-9.02%",
     },
     {
       code: "4",
@@ -287,7 +299,6 @@ const RightPanel = () => {
       description:
         "საყოფაცხოვრებო ნივთები, ავეჯი, საოჯახო ტექნიკა, სახლის მოვლა",
       annualGrowth: cl4,
-      priceChange: "0.52%",
     },
     {
       code: "5",
@@ -296,7 +307,6 @@ const RightPanel = () => {
       description:
         "ელექტროენერგია, ბუნებრივი გაზი, საწვავი; წყალმომარაგება, სანიტარული მომსახურება",
       annualGrowth: cl5,
-      priceChange: "-2.42%",
     },
     {
       code: "6",
@@ -304,9 +314,12 @@ const RightPanel = () => {
       title: "ჯანმრთელობის დაცვა",
       description: "ჯანმრთელობის მომსახურება, სამედიცინო პროდუქცია",
       annualGrowth: cl6,
-      priceChange: "0.29%",
     },
   ];
+
+  categoriesLeft.forEach((item, index) => {
+    item.priceChange = `${parsed2[index]}%`;
+  });
 
   let cr7 = parsed[6]?.weight;
   cr7 = cr7 ? `${(Number(cr7) * 100).toFixed(2)}%` : "N/A";
@@ -334,7 +347,6 @@ const RightPanel = () => {
       description:
         "სატრანსპორტო საშუალებების შეძენა და ექსპლუატაცია; სატრანსპორტო მომსახურება",
       annualGrowth: cr7,
-      priceChange: "12.78%",
     },
     {
       code: "8",
@@ -342,7 +354,6 @@ const RightPanel = () => {
       title: "კომუნიკაციები",
       description: "საკომუნიკაციო მომსახურება და ტელეფონები",
       annualGrowth: cr8,
-      priceChange: "0.29%",
     },
     {
       code: "9",
@@ -350,7 +361,6 @@ const RightPanel = () => {
       title: "დასვენება, გართობა და კულტურა",
       description: "დასვენება, კულტურული და გართობის მომსახურება",
       annualGrowth: cr9,
-      priceChange: "-1.01%",
     },
     {
       code: "10",
@@ -358,7 +368,6 @@ const RightPanel = () => {
       title: "განათლება",
       description: "სასწავლო დაწესებულებების საფასური",
       annualGrowth: cr10,
-      priceChange: "4.30%",
     },
     {
       code: "11",
@@ -366,7 +375,6 @@ const RightPanel = () => {
       title: "სასტუმროები, კაფეები და რესტორნები",
       description: "სასტუმროები, კაფეები და რესტორნები",
       annualGrowth: cr11,
-      priceChange: "1.19%",
     },
     {
       code: "12",
@@ -374,9 +382,12 @@ const RightPanel = () => {
       title: "სხვა სახის საქონელი და მომსახურება",
       description: "პერსონალური საქონელი, დაზღვევა, ფინანსური მომსახურება",
       annualGrowth: cr12,
-      priceChange: "0.78%",
     },
   ];
+
+  categoriesRight.forEach((item, index) => {
+    item.priceChange = `${parsed2[index + 6]}%`;
+  });
 
   const svgRef = useRef();
 

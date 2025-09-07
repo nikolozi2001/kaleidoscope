@@ -69,6 +69,7 @@ const LeftPanel = ({ language }) => {
     let calculated = null;
 
     try {
+      // Left Panel
       if (compareTo === "prevMonth") {
         const response = await axios.get(
           `http://localhost:5000/api/groupindex/${year}/${month}/0/0`
@@ -117,13 +118,51 @@ const LeftPanel = ({ language }) => {
     const response = await axios.get(
       `http://localhost:5000/api/groupweight/${year}/${level}`
     );
-    const data = response.data;
 
     // Save in localStorage
-    localStorage.setItem("result", JSON.stringify(data));
+    localStorage.setItem("result", JSON.stringify(response.data));
 
     // Also update state (if you need it immediately in the UI)
     window.dispatchEvent(new Event("storage")); // notify other components
+
+
+    // Right Panel
+    const response_groupindex = await axios.get(
+      `http://localhost:5000/api/groupindexrightpanel/${year}/${month}`
+    );
+    const groupindex_now = response_groupindex.data;
+
+    let groupindex_year_old = 0;
+    let groupindex_month_old = 0;
+
+    if (compareTo === "prevMonth") {
+      groupindex_month_old = month == 1 ? 12 : month - 1;
+      groupindex_year_old = groupindex_month_old == 12 ? year - 1 : year;
+    }
+    else if (compareTo === "prevYear") {
+      groupindex_year_old = parseInt(year) - 1;
+      groupindex_month_old = parseInt(month);
+    }
+
+    const response_groupindex_old = await axios.get(
+      `http://localhost:5000/api/groupindexrightpanel/${groupindex_year_old}/${groupindex_month_old}`
+    );
+    const groupindex_old = response_groupindex_old.data;
+
+    let groupindex_calculated = [];
+    groupindex_now.forEach((_, i) => {
+      groupindex_calculated.push(
+        ((groupindex_now[i].index / groupindex_old[i].index) * 100 - 100).toFixed(2)
+      );
+    });
+
+    // Save in localStorage
+    localStorage.setItem("groupindex_pricechanges", JSON.stringify(groupindex_calculated));
+
+    // Also update state (if you need it immediately in the UI)
+    window.dispatchEvent(new Event("storage")); // notify other components
+
+
 
     const selectedMonthName =
       months[language === "GE" ? "GE" : "EN"][parseInt(month) - 1] || "";
