@@ -125,7 +125,6 @@ const LeftPanel = ({ language }) => {
     // Also update state (if you need it immediately in the UI)
     window.dispatchEvent(new Event("storage")); // notify other components
 
-
     // Right Panel
     const response_groupindex = await axios.get(
       `http://localhost:5000/api/groupindexrightpanel/${year}/${month}`
@@ -138,8 +137,7 @@ const LeftPanel = ({ language }) => {
     if (compareTo === "prevMonth") {
       groupindex_month_old = month == 1 ? 12 : month - 1;
       groupindex_year_old = groupindex_month_old == 12 ? year - 1 : year;
-    }
-    else if (compareTo === "prevYear") {
+    } else if (compareTo === "prevYear") {
       groupindex_year_old = parseInt(year) - 1;
       groupindex_month_old = parseInt(month);
     }
@@ -152,17 +150,21 @@ const LeftPanel = ({ language }) => {
     let groupindex_calculated = [];
     groupindex_now.forEach((_, i) => {
       groupindex_calculated.push(
-        ((groupindex_now[i].index / groupindex_old[i].index) * 100 - 100).toFixed(2)
+        (
+          (groupindex_now[i].index / groupindex_old[i].index) * 100 -
+          100
+        ).toFixed(2)
       );
     });
 
     // Save in localStorage
-    localStorage.setItem("groupindex_pricechanges", JSON.stringify(groupindex_calculated));
+    localStorage.setItem(
+      "groupindex_pricechanges",
+      JSON.stringify(groupindex_calculated)
+    );
 
     // Also update state (if you need it immediately in the UI)
     window.dispatchEvent(new Event("storage")); // notify other components
-
-
 
     const selectedMonthName =
       months[language === "GE" ? "GE" : "EN"][parseInt(month) - 1] || "";
@@ -197,32 +199,39 @@ const LeftPanel = ({ language }) => {
   return (
     <div className="w-full px-4 py-6 space-y-6">
       {/* Title + Info Icon */}
-      <div className="flex items-center justify-center gap-2">
-        <h1 className="text-lg sm:text-xl text-gray-800 font-bpg-nino text-center">
-          {language === "GE"
-            ? "გაანგარიშების ინსტრუქცია"
-            : "CALCULATION INSTRUCTION"}
-        </h1>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="text-black hover:text-gray-600 transition-colors cursor-pointer"
-          aria-label="Information"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 sm:h-6 sm:w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+      <div className="flex flex-col items-center gap-2">
+        {/* Title with info button */}
+        <div className="flex items-center justify-center gap-2">
+          <h1 className="text-lg sm:text-xl text-gray-800 font-bpg-nino text-center whitespace-nowrap">
+            {language === "GE"
+              ? "გაანგარიშების ინსტრუქცია"
+              : "CALCULATION INSTRUCTION"}
+          </h1>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="text-black hover:text-gray-600 transition-colors cursor-pointer"
+            aria-label="Information"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 sm:h-6 sm:w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </button>
+        </div>
+        {/* Subtitle below */}
+        <p className="text-md sm:text-lg text-gray-700 font-bpg-nino text-center">
+          {language === "GE" ? "დროის პერიოდი" : "TIME PERIOD"}
+        </p>
       </div>
 
       {/* Dropdown filters */}
@@ -250,11 +259,20 @@ const LeftPanel = ({ language }) => {
           <option value="" disabled>
             {language === "GE" ? "თვე" : "Month"}
           </option>
-          {months[language === "GE" ? "GE" : "EN"].map((monthName, index) => (
-            <option key={index} value={index + 1}>
-              {monthName}
-            </option>
-          ))}
+          {months[language === "GE" ? "GE" : "EN"].map((monthName, index) => {
+            const monthValue = index + 1;
+            const isCurrentYear = parseInt(year) === today.getFullYear();
+
+            return (
+              <option
+                key={index}
+                value={monthValue}
+                disabled={isCurrentYear && monthValue > prevMonth} // ⬅ block only in current year
+              >
+                {monthName}
+              </option>
+            );
+          })}
         </select>
 
         <select
