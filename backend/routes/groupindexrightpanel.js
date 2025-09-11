@@ -4,9 +4,9 @@ const config = require("../dbConfig");
 
 const router = express.Router();
 
-// GET /api/groupindexrightpanel/:year/:month/
-router.get("/:year/:month/", async (req, res) => {
-  const { year, month } = req.params;
+// GET /api/groupindexrightpanel/:year/:month/:level
+router.get("/:year/:month/:level", async (req, res) => {
+  const { year, month, level } = req.params;
 
   try {
     let pool = await sql.connect(config);
@@ -14,13 +14,14 @@ router.get("/:year/:month/", async (req, res) => {
       .request()
         .input("year", sql.Int, year)
         .input("month", sql.Int, month)
+        .input("level", sql.Int, level)
       .query(`
         SELECT *
         FROM groupindex
         WHERE
           year = @year AND
           month = @month AND
-          level = 1
+          level = @level
       `);
 
     if (result.recordset.length === 0) {

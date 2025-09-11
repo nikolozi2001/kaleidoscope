@@ -39,180 +39,13 @@ const getColorForValue = (value) => {
   return legendRanges[0];
 };
 
-const data = [
-  { code: 1, name: "სურსათი", value: 10.39, secondValue: 31.72 },
-  { code: 1, name: "უალკოჰოლო სასმელები", value: 10.79, secondValue: 2.75 },
-  { code: 2, name: "ალკოჰოლური სასმელები", value: 2.88, secondValue: 3.11 },
-  { code: 2, name: "თამბაქოს ნაწარმი", value: 5.79, secondValue: 3.31 },
-  { code: 3, name: "ტანსაცმელი", value: -1.92, secondValue: 3.1 },
-  { code: 3, name: "ფეხსაცმელი", value: -3.08, secondValue: 1.62 },
-  {
-    code: 4,
-    name: "ფაქტიური გადასახადი საცხოვრებელზე",
-    value: 3.56,
-    secondValue: 2.48,
-  },
-  { code: 4, name: "დარიცხული ბინის გადასახადი", value: 0, secondValue: 0 },
-  {
-    code: 4,
-    name: "საცხოვრებლის მიმდინარე მოვლა და შეკეთება",
-    value: 2.42,
-    secondValue: 0.96,
-  },
-  {
-    code: 4,
-    name: "წყალმომარაგება და საცხოვრებელთან დაკავშირებული სხვა მომსახურება",
-    value: 0.29,
-    secondValue: 1.0,
-  },
-  {
-    code: 4,
-    name: "ელექტროენერგია, აირი და სათბობის სხვა სახეები",
-    value: 13.87,
-    secondValue: 5.39,
-  },
-  {
-    code: 5,
-    name: "ავეჯი, საოჯახო ნივთები, ხალიჩები და სხვა იატაკის საფარი და რემონტი",
-    value: 2.34,
-    secondValue: 0.65,
-  },
-  { code: 5, name: "საოჯახო საფეიქრო ნაწარმი", value: 8.95, secondValue: 0.08 },
-  {
-    code: 5,
-    name: "გამათბობელი და საჭმლის მოსამზადებელი მოწყობილობა, მაცივრები, საყინულეები, სარეცხი მანქანები და სხვა საყოფაცხოვრებო საგნები, დაყენებისა და რემონტის ჩათვლით",
-    value: -9.02,
-    secondValue: 1.08,
-  },
-  {
-    code: 5,
-    name: "მინის ჭურჭელი, მაგიდის და საოჯახო ჭურჭელი",
-    value: 13.87,
-    secondValue: 0.93,
-  },
-  {
-    code: 5,
-    name: "ინსტრუმენტები, მოწყობილობა და ტექნიკა სახლისა და ბაღისთვის",
-    value: 3.56,
-    secondValue: 0.05,
-  },
-  {
-    code: 5,
-    name: "ყოველდღიური საყოფაცხოვრებო საჭიროების საქონელი და მომსახურება",
-    value: -1.01,
-    secondValue: 1.03,
-  },
-  {
-    code: 6,
-    name: "სამედიცინო პროდუქცია, აპარატურა და მოწყობილობა",
-    value: 4,
-    secondValue: 4.57,
-  },
-  {
-    code: 6,
-    name: "ამბულატორიული სამედიცინო მომსახურება",
-    value: 12,
-    secondValue: 2.04,
-  },
-  {
-    code: 6,
-    name: "საავადმყოფოების მომსახურება",
-    value: 14,
-    secondValue: 1.45,
-  },
-  {
-    code: 7,
-    name: "სატრანსპორტო საშუალებების შეძენა",
-    value: 17,
-    secondValue: 0.51,
-  },
-  {
-    code: 7,
-    name: "პირადი სატრანსპორტო საშუალებების ექსპლოატაცია",
-    value: 4.24,
-    secondValue: 26.94,
-  },
-  { code: 7, name: "სატრანსპორტო მომსახურება", value: 4.24, secondValue: 5.94 },
-  { code: 8, name: "საფოსტო მომსახურება", value: 4.24, secondValue: 4.91 },
-  {
-    code: 8,
-    name: "სატელეფონო და სატელეფაქსო მოწყობილობები",
-    value: 4.24,
-    secondValue: 5.68,
-  },
-  {
-    code: 8,
-    name: "სატელეფონო, სატელეგრაფო და სატელეფაქსო მომსახურება",
-    value: 4.24,
-    secondValue: 5.42,
-  },
-  {
-    code: 9,
-    name: "აუდიო ვიზუალური, ფოტოგრაფიული და მონაცემთა დამუშავების მოწყობილობები, რემონტის ჩათვლით",
-    value: 4.24,
-    secondValue: 4.64,
-  },
-  {
-    code: 9,
-    name: "დასვენების, გართობისა და კულტურის ხანგრძლივი მოხმარების სხვა საქონელი",
-    value: 4.24,
-    secondValue: 4.39,
-  },
-  {
-    code: 9,
-    name: "დასვენებისა და გართობისათვის აუცილებელი სხვა მოწყობილობა; ბაღები, ყვავილები და შინაური ცხოველები",
-    value: 4.24,
-    secondValue: 4.13,
-  },
-  {
-    code: 9,
-    name: "გასართობი და კულტურული მომსახურება",
-    value: 4.24,
-    secondValue: 4.13,
-  },
-  {
-    code: 9,
-    name: "წიგნები, გაზეთები და საკანცელარიო ნივთები",
-    value: 4.24,
-    secondValue: 3.87,
-  },
-  { code: 9, name: "ტურისტული მოგზაურობა", value: 4.24, secondValue: 3.35 },
-  {
-    code: 10,
-    name: "სკოლამდელი და დაწყებითი განათლება",
-    value: 4.24,
-    secondValue: 3.1,
-  },
-  { code: 10, name: "საშუალო განათლება", value: 4.24, secondValue: 2.84 },
-  { code: 10, name: "უმაღლესი განათლება", value: 4.24, secondValue: 2.32 },
-  {
-    code: 10,
-    name: "დონით განუსაზღვრელი განათლება",
-    value: 4.24,
-    secondValue: 2.06,
-  },
-  { code: 11, name: "საზოგადოებრივი კვება", value: 4.24, secondValue: 1.81 },
-  {
-    code: 11,
-    name: "ღამის გასათევით მომსახურება",
-    value: 4.24,
-    secondValue: 1.29,
-  },
-  { code: 12, name: "პირადი ჰიგიენა", value: 4.24, secondValue: 1.55 },
-  {
-    code: 12,
-    name: "პირადი ნივთები, სხვა კატეგორიებში ჩაურთველი",
-    value: 4.24,
-    secondValue: 1.03,
-  },
-  { code: 12, name: "დაზღვევა", value: 4.24, secondValue: 0.77 },
-  { code: 12, name: "საფინანსო მომსახურება", value: 4.24, secondValue: 0.26 },
-  { code: 12, name: "სხვა სახის მომსახურება", value: 4.24, secondValue: 0.51 },
-];
-
 const RightPanel = () => {
   const [parsed, setParsed] = useState([]);
   const [parsed2, setParsed2] = useState([]);
+  const [parsed3, setParsed3] = useState([]);
+  const [parsed4, setParsed4] = useState([]);
+
+  let groupweightchart = [];
 
   // Load data on mount
   useEffect(() => {
@@ -234,6 +67,34 @@ const RightPanel = () => {
       }
     }
 
+    const saved3 = localStorage.getItem("groupweightchart");
+    if (saved3) {
+      try {
+        setParsed3(JSON.parse(saved3));
+      } catch (err) {
+        console.error("Error parsing localStorage result:", err);
+      }
+    }
+
+    const saved4 = localStorage.getItem("groupindexchart");
+    if (saved4) {
+      try {
+        setParsed4(JSON.parse(saved4));
+      } catch (err) {
+        console.error("Error parsing localStorage result:", err);
+      }
+    }
+
+    groupweightchart = JSON.parse(saved3);
+    let groupindexchart = JSON.parse(saved4);
+
+    groupweightchart.forEach(item1 => {
+      const match = groupindexchart.find(item2 => item2.code === item1.code);
+      if (match) {
+        item1.index = match.index;
+      }
+    });
+
     // Listen for changes to localStorage
     const handleStorageChange = () => {
       const updated = localStorage.getItem("result");
@@ -249,8 +110,6 @@ const RightPanel = () => {
       window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
-
-  console.log("parsed2", parsed2);
 
   let cl1 = parsed[0]?.weight;
   cl1 = cl1 ? `${(Number(cl1) * 100).toFixed(2)}%` : "N/A";
@@ -392,134 +251,137 @@ const RightPanel = () => {
   const svgRef = useRef();
 
   useEffect(() => {
-    const width = 500;
-    const height = 500;
-    const radius = Math.min(width, height) / 2 - 10;
+  if (!groupweightchart || groupweightchart.length === 0) return; // safety check
 
-    const svg = d3.select(svgRef.current);
-    svg.selectAll("*").remove();
+  const width = 500;
+  const height = 500;
+  const radius = Math.min(width, height) / 2 - 10;
 
-    // Scale distance from center based on secondValue
-    const secondValueScale = d3
-      .scaleLinear()
-      .domain([0, d3.max(data, (d) => d.secondValue)])
-      .range([radius * 0.2, radius * 0.9]);
+  const svg = d3.select(svgRef.current);
+  svg.selectAll("*").remove();
 
-    // evenly distribute points around a circle
-    const angleStep = (2 * Math.PI) / data.length;
-    const points = data.map((d, i) => {
-      const angle = i * angleStep;
-      const r = secondValueScale(d.secondValue);
-      return [
-        width / 2 + r * Math.cos(angle),
-        height / 2 + r * Math.sin(angle),
-      ];
-    });
+  // Scale distance from center based on weight
+  const weightScale = d3
+    .scaleLinear()
+    .domain([0, d3.max(groupweightchart, (d) => Number(d.weight))])
+    .range([radius * 0.2, radius * 0.9]);
 
-    const delaunay = Delaunay.from(points);
-    const voronoi = delaunay.voronoi([0, 0, width, height]);
+  // evenly distribute points around circle
+  const angleStep = (2 * Math.PI) / groupweightchart.length;
+  const points = groupweightchart.map((d, i) => {
+    const angle = i * angleStep;
+    const r = weightScale(Number(d.weight));
+    return [
+      width / 2 + r * Math.cos(angle),
+      height / 2 + r * Math.sin(angle),
+    ];
+  });
 
-    svg
-      .attr("width", width)
-      .attr("height", height)
-      .append("defs")
-      .append("filter")
-      .attr("id", "drop-shadow")
-      .append("feDropShadow")
-      .attr("dx", 2)
-      .attr("dy", 2)
-      .attr("stdDeviation", 2)
-      .attr("flood-color", "rgba(0, 0, 0, 0.2)");
+  const delaunay = Delaunay.from(points);
+  const voronoi = delaunay.voronoi([0, 0, width, height]);
 
-    svg
-      .append("circle")
-      .attr("cx", width / 2)
-      .attr("cy", height / 2)
-      .attr("r", radius)
-      .attr("fill", "none")
-      .attr("stroke", "grey")
-      .attr("stroke-width", 21);
+  // add shadow filter
+  svg
+    .attr("width", width)
+    .attr("height", height)
+    .append("defs")
+    .append("filter")
+    .attr("id", "drop-shadow")
+    .append("feDropShadow")
+    .attr("dx", 2)
+    .attr("dy", 2)
+    .attr("stdDeviation", 2)
+    .attr("flood-color", "rgba(0, 0, 0, 0.2)");
 
-    svg
-      .append("circle")
-      .attr("cx", width / 2)
-      .attr("cy", height / 2)
-      .attr("r", radius)
-      .attr("fill", "none")
+  // base circles (outer border + white overlay)
+  svg
+    .append("circle")
+    .attr("cx", width / 2)
+    .attr("cy", height / 2)
+    .attr("r", radius)
+    .attr("fill", "none")
+    .attr("stroke", "grey")
+    .attr("stroke-width", 21);
+
+  svg
+    .append("circle")
+    .attr("cx", width / 2)
+    .attr("cy", height / 2)
+    .attr("r", radius)
+    .attr("fill", "none")
+    .attr("stroke", "#fff")
+    .attr("stroke-width", 5);
+
+  // clip path to circle
+  svg
+    .append("clipPath")
+    .attr("id", "circle-clip")
+    .append("circle")
+    .attr("cx", width / 2)
+    .attr("cy", height / 2)
+    .attr("r", radius);
+
+  const g = svg.append("g").attr("clip-path", "url(#circle-clip)");
+
+  const minStroke = 3;
+  const maxStroke = 8;
+  const maxVal = d3.max(groupweightchart, (d) => Math.abs(Number(d.index))) || 1;
+
+  points.forEach((point, i) => {
+    const cell = voronoi.cellPolygon(i);
+    if (!cell) return;
+
+    const { fill, fillOpacity } = getColorForValue(Number(groupweightchart[i].index));
+
+    g.append("path")
+      .attr("d", "M" + cell.join("L") + "Z")
+      .attr("fill", fill)
+      .attr("fill-opacity", fillOpacity)
       .attr("stroke", "#fff")
-      .attr("stroke-width", 5);
+      .attr("stroke-width", () => {
+        const val = Math.abs(Number(groupweightchart[i].index));
+        return minStroke + (val / maxVal) * (maxStroke - minStroke);
+      })
+      .attr("opacity", 0.9)
+      .style("filter", "url(#drop-shadow)")
+      .on("mouseover", function (event) {
+        d3.select(this)
+          .attr("opacity", 1)
+          .attr("stroke-width", 7)
+          .attr("stroke", "white");
 
-    svg
-      .append("clipPath")
-      .attr("id", "circle-clip")
-      .append("circle")
-      .attr("cx", width / 2)
-      .attr("cy", height / 2)
-      .attr("r", radius);
-
-    const g = svg.append("g").attr("clip-path", "url(#circle-clip)");
-
-    const maxValue = d3.max(data, (d) => Math.abs(d.value));
-    const minStroke = 3;
-    const maxStroke = 8;
-
-    points.forEach((point, i) => {
-      const cell = voronoi.cellPolygon(i);
-      if (!cell) return;
-
-      const { fill, fillOpacity } = getColorForValue(data[i].value);
-
-      g.append("path")
-        .attr("d", "M" + cell.join("L") + "Z")
-        .attr("fill", fill)
-        .attr("fill-opacity", fillOpacity)
-        .attr("stroke", "#fff")
-        .attr("stroke-width", () => {
-          const val = Math.abs(data[i].secondValue);
-          return (
-            minStroke +
-            (val / d3.max(data, (d) => d.secondValue)) * (maxStroke - minStroke)
+        const tooltip = d3
+          .select("body")
+          .append("div")
+          .attr("class", "tooltip")
+          .style("position", "absolute")
+          .style("background", "rgba(255,255,255)")
+          .style("color", "black")
+          .style("padding", "8px")
+          .style("border-radius", "4px")
+          .style("font-size", "12px")
+          .style("font-family", "BPG Nino Mtavruli")
+          .style("pointer-events", "none")
+          .style("z-index", "1000")
+          .html(
+            `${groupweightchart[i].title_geo}<br/>ფასების ცვლილება: ${groupweightchart[i].index}%<br/>წონა: ${groupweightchart[i].weight}%`
           );
-        })
-        .attr("opacity", 0.9)
-        .style("filter", "url(#drop-shadow)")
-        .on("mouseover", function (event) {
-          d3.select(this)
-            .attr("opacity", 1)
-            .attr("stroke-width", 7)
-            .attr("stroke", "white");
 
-          const tooltip = d3
-            .select("body")
-            .append("div")
-            .attr("class", "tooltip")
-            .style("position", "absolute")
-            .style("background", "rgba(255,255,255)")
-            .style("color", "black")
-            .style("padding", "8px")
-            .style("border-radius", "4px")
-            .style("font-size", "12px")
-            .style("font-family", "BPG Nino Mtavruli")
-            .style("pointer-events", "none")
-            .style("z-index", "1000")
-            .html(
-              `${data[i].name}<br/>ფასების ცვლილება: ${data[i].value}%<br/>წონა: ${data[i].secondValue}%`
-            );
+        tooltip
+          .style("left", event.pageX + 10 + "px")
+          .style("top", event.pageY - 10 + "px");
+      })
+      .on("mouseout", function () {
+        d3.select(this)
+          .attr("opacity", 0.9)
+          .attr("stroke-width", 3)
+          .attr("stroke", "#fff");
 
-          tooltip
-            .style("left", event.pageX + 10 + "px")
-            .style("top", event.pageY - 10 + "px");
-        })
-        .on("mouseout", function () {
-          d3.select(this)
-            .attr("opacity", 0.9)
-            .attr("stroke-width", 3)
-            .attr("stroke", "#fff");
+        d3.selectAll(".tooltip").remove();
+      });
+  });
+}, [groupweightchart]);
 
-          d3.selectAll(".tooltip").remove();
-        });
-    });
-  }, []);
 
   return (
     <div className="flex flex-col sm:flex-row flex-1 p-4 gap-4">

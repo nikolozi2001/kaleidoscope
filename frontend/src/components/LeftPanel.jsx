@@ -127,7 +127,7 @@ const LeftPanel = ({ language }) => {
 
     // Right Panel
     const response_groupindex = await axios.get(
-      `http://localhost:5000/api/groupindexrightpanel/${year}/${month}`
+      `http://localhost:5000/api/groupindexrightpanel/${year}/${month}/1`
     );
     const groupindex_now = response_groupindex.data;
 
@@ -143,7 +143,7 @@ const LeftPanel = ({ language }) => {
     }
 
     const response_groupindex_old = await axios.get(
-      `http://localhost:5000/api/groupindexrightpanel/${groupindex_year_old}/${groupindex_month_old}`
+      `http://localhost:5000/api/groupindexrightpanel/${groupindex_year_old}/${groupindex_month_old}/1`
     );
     const groupindex_old = response_groupindex_old.data;
 
@@ -161,6 +161,56 @@ const LeftPanel = ({ language }) => {
     localStorage.setItem(
       "groupindex_pricechanges",
       JSON.stringify(groupindex_calculated)
+    );
+
+    // Also update state (if you need it immediately in the UI)
+    window.dispatchEvent(new Event("storage")); // notify other components
+
+    // Chart
+    const response_groupweightchart = await axios.get(
+      `http://localhost:5000/api/groupweightchart/${year}`
+    );
+
+    // Save in localStorage
+    localStorage.setItem(
+      "groupweightchart",
+      JSON.stringify(response_groupweightchart.data)
+    );
+
+    // Also update state (if you need it immediately in the UI)
+    window.dispatchEvent(new Event("storage")); // notify other components
+
+
+    // Chart
+    const response_groupindex2 = await axios.get(
+      `http://localhost:5000/api/groupindexrightpanel/${year}/${month}/2`
+    );
+    const groupindex2_now = response_groupindex2.data;
+
+    let groupindex2_year_old = 0;
+    let groupindex2_month_old = 0;
+
+    if (compareTo === "prevMonth") {
+      groupindex2_month_old = month == 1 ? 12 : month - 1;
+      groupindex2_year_old = groupindex2_month_old == 12 ? year - 1 : year;
+    } else if (compareTo === "prevYear") {
+      groupindex2_year_old = parseInt(year) - 1;
+      groupindex2_month_old = parseInt(month);
+    }
+
+    const response_groupindex2_old = await axios.get(
+      `http://localhost:5000/api/groupindexrightpanel/${groupindex2_year_old}/${groupindex2_month_old}/2`
+    );
+    const groupindex2_old = response_groupindex2_old.data;
+
+    groupindex2_now.forEach((_, i) => {
+      groupindex2_now[i].index = ((groupindex2_now[i].index / groupindex2_old[i].index) * 100 - 100).toFixed(2)
+    });
+
+    // Save in localStorage
+    localStorage.setItem(
+      "groupindexchart",
+      JSON.stringify(groupindex2_now)
     );
 
     // Also update state (if you need it immediately in the UI)
