@@ -12,33 +12,22 @@ router.get("/:year", async (req, res) => {
     let pool = await sql.connect(config);
     let result = await pool
       .request()
-        .input("year", sql.Int, year)
+      .input("year", sql.Int, year)
       .query(`
         SELECT
-             groupweight.[id]
-            ,groupweight.[code]
-            --,groupweight.[level]
-            --,groupweight.[year]
-            --,groupweight.[weight] AS weight_original
-            ,FORMAT(CAST(groupweight.[weight] AS FLOAT) * 100, 'N2') AS weight
-			      -- ,groupindex.[index] AS groupindex
-            --,translates.[id]
-            ,translates.[title_geo]
-            ,translates.[title_en]
-            --,translates.[code]
-            --,translates.[level]
-            --,translates.[parent_id]
-        FROM [kaleidoscope].[dbo].[groupweight] AS groupweight
-        JOIN [kaleidoscope].[dbo].[coicopgroup] AS translates
-         ON translates.code = groupweight.code
-        AND translates.level = groupweight.level
-        -- JOIN [kaleidoscope].[dbo].[groupindex] AS groupindex
-        -- ON groupindex.code = groupweight.code AND groupindex.level = 2
+             gw.[id]
+            ,gw.[code]
+            ,FORMAT(TRY_CAST(gw.[weight] AS FLOAT) * 100, 'N2') AS weight
+            ,tr.[title_geo]
+            ,tr.[title_en]
+        FROM [kaleidoscope].[dbo].[groupweight] AS gw
+        JOIN [kaleidoscope].[dbo].[coicopgroup] AS tr
+          ON tr.code = gw.code
+         AND tr.level = gw.level
         WHERE
-            groupweight.level = 2
-        AND CAST(groupweight.[weight] AS FLOAT) > 0
-        AND groupweight.year = @year
-        -- AND groupindex.month = @month
+            gw.level = 2
+        AND TRY_CAST(gw.[weight] AS FLOAT) > 0
+        AND gw.year = @year
       `);
 
     if (result.recordset.length === 0) {
@@ -47,7 +36,8 @@ router.get("/:year", async (req, res) => {
 
     res.json(result.recordset);
   } catch (err) {
-    res.status(500).send(err.message);
+    console.error("SQL error:", err);
+    res.status(500).send("Server error while fetching groupweightchart data.");
   }
 });
 

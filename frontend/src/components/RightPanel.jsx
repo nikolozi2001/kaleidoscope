@@ -39,78 +39,50 @@ const getColorForValue = (value) => {
   return legendRanges[0];
 };
 
-const RightPanel = () => {
+const RightPanel = ({ language }) => {
   const [parsed, setParsed] = useState([]);
   const [parsed2, setParsed2] = useState([]);
-  const [parsed3, setParsed3] = useState([]);
-  const [parsed4, setParsed4] = useState([]);
+  const [parsed3, setParsed3] = useState([]); // groupweightchart
+  const [parsed4, setParsed4] = useState([]); // groupindexchart
 
-  let groupweightchart = [];
+  const svgRef = useRef();
 
-  // Load data on mount
+  // Load data initially + on event
   useEffect(() => {
-    const saved = localStorage.getItem("result");
-    if (saved) {
-      try {
-        setParsed(JSON.parse(saved));
-      } catch (err) {
-        console.error("Error parsing localStorage result:", err);
-      }
-    }
+    const loadData = () => {
+      const saved = localStorage.getItem("result");
+      if (saved) setParsed(JSON.parse(saved));
 
-    const saved2 = localStorage.getItem("groupindex_pricechanges");
-    if (saved2) {
-      try {
-        setParsed2(JSON.parse(saved2));
-      } catch (err) {
-        console.error("Error parsing localStorage result:", err);
-      }
-    }
+      const saved2 = localStorage.getItem("groupindex_pricechanges");
+      if (saved2) setParsed2(JSON.parse(saved2));
 
-    const saved3 = localStorage.getItem("groupweightchart");
-    if (saved3) {
-      try {
-        setParsed3(JSON.parse(saved3));
-      } catch (err) {
-        console.error("Error parsing localStorage result:", err);
-      }
-    }
+      const saved3 = localStorage.getItem("groupweightchart");
+      const saved4 = localStorage.getItem("groupindexchart");
 
-    const saved4 = localStorage.getItem("groupindexchart");
-    if (saved4) {
-      try {
-        setParsed4(JSON.parse(saved4));
-      } catch (err) {
-        console.error("Error parsing localStorage result:", err);
-      }
-    }
+      let parsed3Data = saved3 ? JSON.parse(saved3) : [];
+      let parsed4Data = saved4 ? JSON.parse(saved4) : [];
 
-    groupweightchart = JSON.parse(saved3);
-    let groupindexchart = JSON.parse(saved4);
+      // merge index values into parsed3Data
+      parsed3Data.forEach((item1) => {
+        const match = parsed4Data.find((item2) => item2.code === item1.code);
+        if (match) {
+          item1.index = match.index;
+        }
+      });
 
-    groupweightchart.forEach(item1 => {
-      const match = groupindexchart.find(item2 => item2.code === item1.code);
-      if (match) {
-        item1.index = match.index;
-      }
-    });
+      setParsed3(parsed3Data);
+      setParsed4(parsed4Data);
 
-    // Listen for changes to localStorage
-    const handleStorageChange = () => {
-      const updated = localStorage.getItem("result");
-      if (updated) setParsed(JSON.parse(updated));
-
-      const updated2 = localStorage.getItem("groupindex_pricechanges");
-      if (updated2) setParsed2(JSON.parse(updated2));
+      console.log(parsed3Data);
     };
 
-    window.addEventListener("storage", handleStorageChange);
+    loadData();
 
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
+    window.addEventListener("localStorageUpdated", loadData);
+    return () => window.removeEventListener("localStorageUpdated", loadData);
   }, []);
 
+  // weights
   let cl1 = parsed[0]?.weight;
   cl1 = cl1 ? `${(Number(cl1) * 100).toFixed(2)}%` : "N/A";
 
@@ -177,7 +149,7 @@ const RightPanel = () => {
   ];
 
   categoriesLeft.forEach((item, index) => {
-    item.priceChange = `${parsed2[index]}%`;
+    item.priceChange = parsed2[index] ? `${parsed2[index]}%` : "N/A";
   });
 
   let cr7 = parsed[6]?.weight;
@@ -202,9 +174,11 @@ const RightPanel = () => {
     {
       code: "7",
       icon: imgs7,
-      title: "ტრანსპორტი",
+      title: language === "GE" ? "ტრანსპორტი" : "TRANSPORT",
       description:
-        "სატრანსპორტო საშუალებების შეძენა და ექსპლუატაცია; სატრანსპორტო მომსახურება",
+        language === "GE"
+          ? "სატრანსპორტო საშუალებების შეძენა და ექსპლუატაცია; სატრანსპორტო მომსახურება"
+          : "Purchase and operation of transport vehicles; transport services",
       annualGrowth: cr7,
     },
     {
@@ -245,143 +219,135 @@ const RightPanel = () => {
   ];
 
   categoriesRight.forEach((item, index) => {
-    item.priceChange = `${parsed2[index + 6]}%`;
+    item.priceChange = parsed2[index + 6] ? `${parsed2[index + 6]}%` : "N/A";
   });
 
-  const svgRef = useRef();
-
+  // D3 chart
   useEffect(() => {
-  if (!groupweightchart || groupweightchart.length === 0) return; // safety check
+    if (!parsed3 || parsed3.length === 0) return;
 
-  const width = 500;
-  const height = 500;
-  const radius = Math.min(width, height) / 2 - 10;
+    const width = 500;
+    const height = 500;
 
-  const svg = d3.select(svgRef.current);
-  svg.selectAll("*").remove();
+    const svg = d3.select(svgRef.current);
+    svg.selectAll("*").remove();
 
-  // Scale distance from center based on weight
-  const weightScale = d3
-    .scaleLinear()
-    .domain([0, d3.max(groupweightchart, (d) => Number(d.weight))])
-    .range([radius * 0.2, radius * 0.9]);
+    // Scale radius based on weight
+    const maxWeight = d3.max(parsed3, (d) => Number(d.weight)) || 1;
+    const baseRadius = d3.scaleLinear().domain([0, maxWeight]).range([50, 220]); // chart size per weight
 
-  // evenly distribute points around circle
-  const angleStep = (2 * Math.PI) / groupweightchart.length;
-  const points = groupweightchart.map((d, i) => {
-    const angle = i * angleStep;
-    const r = weightScale(Number(d.weight));
-    return [
-      width / 2 + r * Math.cos(angle),
-      height / 2 + r * Math.sin(angle),
-    ];
-  });
+    const angleStep = (2 * Math.PI) / parsed3.length;
+    const points = parsed3.map((d, i) => {
+      const angle = i * angleStep;
+      const r = baseRadius(Number(d.weight));
+      return [
+        width / 2 + r * Math.cos(angle),
+        height / 2 + r * Math.sin(angle),
+      ];
+    });
 
-  const delaunay = Delaunay.from(points);
-  const voronoi = delaunay.voronoi([0, 0, width, height]);
+    const delaunay = Delaunay.from(points);
+    const voronoi = delaunay.voronoi([0, 0, width, height]);
 
-  // add shadow filter
-  svg
-    .attr("width", width)
-    .attr("height", height)
-    .append("defs")
-    .append("filter")
-    .attr("id", "drop-shadow")
-    .append("feDropShadow")
-    .attr("dx", 2)
-    .attr("dy", 2)
-    .attr("stdDeviation", 2)
-    .attr("flood-color", "rgba(0, 0, 0, 0.2)");
+    svg
+      .attr("width", width)
+      .attr("height", height)
+      .append("defs")
+      .append("filter")
+      .attr("id", "drop-shadow")
+      .append("feDropShadow")
+      .attr("dx", 2)
+      .attr("dy", 2)
+      .attr("stdDeviation", 2)
+      .attr("flood-color", "rgba(0, 0, 0, 0.2)");
 
-  // base circles (outer border + white overlay)
-  svg
-    .append("circle")
-    .attr("cx", width / 2)
-    .attr("cy", height / 2)
-    .attr("r", radius)
-    .attr("fill", "none")
-    .attr("stroke", "grey")
-    .attr("stroke-width", 21);
+    // Draw max circle outline
+    svg
+      .append("circle")
+      .attr("cx", width / 2)
+      .attr("cy", height / 2)
+      .attr("r", baseRadius(maxWeight))
+      .attr("fill", "none")
+      .attr("stroke", "grey")
+      .attr("stroke-width", 21);
 
-  svg
-    .append("circle")
-    .attr("cx", width / 2)
-    .attr("cy", height / 2)
-    .attr("r", radius)
-    .attr("fill", "none")
-    .attr("stroke", "#fff")
-    .attr("stroke-width", 5);
-
-  // clip path to circle
-  svg
-    .append("clipPath")
-    .attr("id", "circle-clip")
-    .append("circle")
-    .attr("cx", width / 2)
-    .attr("cy", height / 2)
-    .attr("r", radius);
-
-  const g = svg.append("g").attr("clip-path", "url(#circle-clip)");
-
-  const minStroke = 3;
-  const maxStroke = 8;
-  const maxVal = d3.max(groupweightchart, (d) => Math.abs(Number(d.index))) || 1;
-
-  points.forEach((point, i) => {
-    const cell = voronoi.cellPolygon(i);
-    if (!cell) return;
-
-    const { fill, fillOpacity } = getColorForValue(Number(groupweightchart[i].index));
-
-    g.append("path")
-      .attr("d", "M" + cell.join("L") + "Z")
-      .attr("fill", fill)
-      .attr("fill-opacity", fillOpacity)
+    svg
+      .append("circle")
+      .attr("cx", width / 2)
+      .attr("cy", height / 2)
+      .attr("r", baseRadius(maxWeight))
+      .attr("fill", "none")
       .attr("stroke", "#fff")
-      .attr("stroke-width", () => {
-        const val = Math.abs(Number(groupweightchart[i].index));
-        return minStroke + (val / maxVal) * (maxStroke - minStroke);
-      })
-      .attr("opacity", 0.9)
-      .style("filter", "url(#drop-shadow)")
-      .on("mouseover", function (event) {
-        d3.select(this)
-          .attr("opacity", 1)
-          .attr("stroke-width", 7)
-          .attr("stroke", "white");
+      .attr("stroke-width", 5);
 
-        const tooltip = d3
-          .select("body")
-          .append("div")
-          .attr("class", "tooltip")
-          .style("position", "absolute")
-          .style("background", "rgba(255,255,255)")
-          .style("color", "black")
-          .style("padding", "8px")
-          .style("border-radius", "4px")
-          .style("font-size", "12px")
-          .style("font-family", "BPG Nino Mtavruli")
-          .style("pointer-events", "none")
-          .style("z-index", "1000")
-          .html(
-            `${groupweightchart[i].title_geo}<br/>ფასების ცვლილება: ${groupweightchart[i].index}%<br/>წონა: ${groupweightchart[i].weight}%`
-          );
+    svg
+      .append("clipPath")
+      .attr("id", "circle-clip")
+      .append("circle")
+      .attr("cx", width / 2)
+      .attr("cy", height / 2)
+      .attr("r", baseRadius(maxWeight));
 
-        tooltip
-          .style("left", event.pageX + 10 + "px")
-          .style("top", event.pageY - 10 + "px");
-      })
-      .on("mouseout", function () {
-        d3.select(this)
-          .attr("opacity", 0.9)
-          .attr("stroke-width", 3)
-          .attr("stroke", "#fff");
+    const g = svg.append("g").attr("clip-path", "url(#circle-clip)");
 
-        d3.selectAll(".tooltip").remove();
-      });
-  });
-}, [groupweightchart]);
+    const minStroke = 3;
+    const maxStroke = 8;
+    const maxVal = d3.max(parsed3, (d) => Math.abs(Number(d.index))) || 1;
 
+    points.forEach((point, i) => {
+      const cell = voronoi.cellPolygon(i);
+      if (!cell) return;
+
+      const { fill, fillOpacity } = getColorForValue(Number(parsed3[i].index));
+
+      g.append("path")
+        .attr("d", "M" + cell.join("L") + "Z")
+        .attr("fill", fill)
+        .attr("fill-opacity", fillOpacity)
+        .attr("stroke", "#fff")
+        .attr("stroke-width", () => {
+          const val = Math.abs(Number(parsed3[i].index));
+          return minStroke + (val / maxVal) * (maxStroke - minStroke);
+        })
+        .attr("opacity", 0.9)
+        .style("filter", "url(#drop-shadow)")
+        .on("mouseover", function (event) {
+          d3.select(this)
+            .attr("opacity", 1)
+            .attr("stroke-width", 7)
+            .attr("stroke", "white");
+
+          const tooltip = d3
+            .select("body")
+            .append("div")
+            .attr("class", "tooltip")
+            .style("position", "absolute")
+            .style("background", "rgba(255,255,255)")
+            .style("color", "black")
+            .style("padding", "8px")
+            .style("border-radius", "4px")
+            .style("font-size", "12px")
+            .style("font-family", "BPG Nino Mtavruli")
+            .style("pointer-events", "none")
+            .style("z-index", "1000")
+            .html(
+              `${parsed3[i].title_geo}<br/>ფასების ცვლილება: ${parsed3[i].index}%<br/>წონა: ${parsed3[i].weight}%`
+            );
+
+          tooltip
+            .style("left", event.pageX + 10 + "px")
+            .style("top", event.pageY - 10 + "px");
+        })
+        .on("mouseout", function () {
+          d3.select(this)
+            .attr("opacity", 0.9)
+            .attr("stroke-width", 3)
+            .attr("stroke", "#fff");
+
+          d3.selectAll(".tooltip").remove();
+        });
+    });
+  }, [parsed3]);
 
   return (
     <div className="flex flex-col sm:flex-row flex-1 p-4 gap-4">

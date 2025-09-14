@@ -180,7 +180,6 @@ const LeftPanel = ({ language }) => {
     // Also update state (if you need it immediately in the UI)
     window.dispatchEvent(new Event("storage")); // notify other components
 
-
     // Chart
     const response_groupindex2 = await axios.get(
       `http://localhost:5000/api/groupindexrightpanel/${year}/${month}/2`
@@ -204,17 +203,17 @@ const LeftPanel = ({ language }) => {
     const groupindex2_old = response_groupindex2_old.data;
 
     groupindex2_now.forEach((_, i) => {
-      groupindex2_now[i].index = ((groupindex2_now[i].index / groupindex2_old[i].index) * 100 - 100).toFixed(2)
+      groupindex2_now[i].index = (
+        (groupindex2_now[i].index / groupindex2_old[i].index) * 100 -
+        100
+      ).toFixed(2);
     });
 
     // Save in localStorage
-    localStorage.setItem(
-      "groupindexchart",
-      JSON.stringify(groupindex2_now)
-    );
+    localStorage.setItem("groupindexchart", JSON.stringify(groupindex2_now));
 
-    // Also update state (if you need it immediately in the UI)
-    window.dispatchEvent(new Event("storage")); // notify other components
+    // Notify others (including RightPanel) in the same tab
+    window.dispatchEvent(new Event("localStorageUpdated"));
 
     const selectedMonthName =
       months[language === "GE" ? "GE" : "EN"][parseInt(month) - 1] || "";
