@@ -174,61 +174,56 @@ const InfoModal = ({ isOpen, onClose, language }) => {
             ) : (
               <>
                 <p>
-                  ფასების კალეიდოსკოპი წარმოადგენს დიაგრამას, რომელიც ასახავს
-                  ინფლაციის მაჩვენებელს საქონლისა და მომსახურების ჯგუფების და
-                  ქვეჯგუფების მიხედვით („დანიშნულების მიხედვით ინდივიდუალური
-                  მოხმარების კლასიფიკაციის“, COICOP-ის შესაბამისად), ასევე მათ
-                  წონებს სამომხმარებლო კალათაში.
+                  The Price Kaleidoscope is a chart representing the inflation
+                  rate by product and service groups and subgroups (according to
+                  COICOP), as well as their weights in the consumer basket.
                 </p>
                 <p className="font-bold mt-4">
-                  ფასების კალეიდოსკოპის გამოყენებით შესაძლებელია:
+                  Using the Price Kaleidoscope, you can:
                 </p>
                 <ul>
                   <li>
-                    საქონლისა და მომსახურების სხვადასხვა ქვეჯგუფზე ფასების
-                    ცვლილების მაჩვენებლის შედარება;
+                    Compare the rate of price change across different product
+                    and service subgroups;
                   </li>
                   <li>
-                    ინფლაციის მაჩვენებლის ფორმირებაში საქონლისა და მომსახურების
-                    ცალკეული ქვეჯგუფების შედარებითი მნიშვნელობის - სამომხმარებლო
-                    კალათაში მათი წონების შედარება.
+                    Compare the relative importance of individual subgroups in
+                    forming the inflation rate – their weights in the consumer
+                    basket.
                   </li>
                 </ul>
-                <p className="font-bold mt-4">გამოყენების ინსტრუქცია</p>
-                <p className="font-bold mt-4">1. აირჩიეთ დროითი პერიოდი</p>
+                <p className="font-bold mt-4">Instructions</p>
+                <p className="font-bold mt-4">1. Select a time period</p>
                 <p>
-                  აირჩიეთ სასურველი წელი და თვე, რა პერიოდისთვისაც გსურთ
-                  ინფლაციის მაჩვენებლის გაანალიზება.
+                  Choose the year and month for which you want to analyze the
+                  inflation rate.
                 </p>
-                <p className="font-bold mt-4">2. მიუთითეთ საბაზო პერიოდი</p>
+                <p className="font-bold mt-4">2. Specify the base period</p>
                 <p>
-                  მიუთითეთ ორი საბაზო პერიოდიდან ერთ-ერთი (ინლაციის მაჩვენებელი
-                  წინა თვესთან ან წინა წლის შესაბამის თვესთან შედარებით).
+                  Choose one of the two base periods (inflation compared to the
+                  previous month or the same month of the previous year).
                 </p>
-                <p className="font-bold mt-4">
-                  3. მიღებული შედეგების ინტერპრეტაცია
-                </p>
+                <p className="font-bold mt-4">3. Interpreting the results</p>
                 <p>
-                  დიაგრამის თოთოეული სეგმენტი ასახავს საქონლისა და მომსახურების
-                  კონკრეტული ქვეჯგუფის წონას სამომხმარებლო კალათაში და ამ
-                  ქვეჯგუფზე ფასების პროცენტულ ცვლილებას მითითებულ საბაზო
-                  პერიოდთან შედარებით. სეგმენტზე კურსორის მიტანის დროს ჩნდება
-                  შესაბამისი ქვეჯგუფის შესახებ შემდეგი ინფორმაცია:
+                  Each segment of the chart reflects the weight of a product or
+                  service subgroup in the consumer basket and the percentage
+                  change in price compared to the selected base period. Hovering
+                  over a segment shows the following information about that
+                  subgroup:
                 </p>
                 <br />
                 <ul>
-                  <li>ქვეჯგუფის დასახელება</li>
-                  <li>ქვეჯგუფზე ფასების ცვლილების პროცენტული მაჩვენებელი</li>
-                  <li>ქვეჯგუფის წონა სამომხმარებლო კალათაში.</li>
+                  <li>Name of the subgroup</li>
+                  <li>Percentage change in price for the subgroup</li>
+                  <li>Weight of the subgroup in the consumer basket</li>
                 </ul>
                 <br />
                 <p>
-                  სეგმენტის ფართობი ასახავს შესაბამისი ქვეჯგუფის წონას
-                  სამომხმარებლო კალათაში. რაც დიდია მოცემული სექტორის ფართობი,
-                  მით უფრო დიდია შესაბამისი ქვეჯგუფის მნიშნვნელობა ინფლაციის
-                  მაჩვენებლის ფორმირების პროცესში. სეგმენტების ფერადი ინდიკაცია
-                  ასახავს შესაბამის ქვეჯგუფზე ფასების ცვლილების ოდენობას,
-                  დიაგრამის ქვემოთ მოცემული სკალის შესაბამისად.
+                  The area of a segment reflects the weight of the subgroup in
+                  the consumer basket. The larger the area of a sector, the more
+                  important the subgroup is in forming the inflation rate. The
+                  color coding of segments represents the extent of price change
+                  according to the scale below the chart.
                 </p>
               </>
             )}

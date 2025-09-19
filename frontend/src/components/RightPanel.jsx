@@ -15,28 +15,47 @@ import imgs10 from "../assets/images/education.png";
 import imgs11 from "../assets/images/hotel.png";
 import imgs12 from "../assets/images/goods.png";
 
-const legendRanges = [
-  { value: -24, fill: "rgb(51, 51, 102)", fillOpacity: 0.7 },
-  { value: -12, fill: "rgb(51, 102, 204)", fillOpacity: 0.7 },
-  { value: -6, fill: "#66ccff", fillOpacity: 0.7 },
-  { value: -2, fill: "#c1eaff", fillOpacity: 0.7 },
-  { value: 0, fill: "#d8e3e8", fillOpacity: 0.7 },
-  { value: 2, fill: "#fffadf", fillOpacity: 0.7 },
-  { value: 6, fill: "#ffcc33", fillOpacity: 0.7 },
-  { value: 12, fill: "#ff9900", fillOpacity: 0.7 },
-  { value: 24, fill: "#ff6600", fillOpacity: 0.7 },
+const legendValues = [-24, -12, -6, -2, 0, 2, 6, 12, 24];
+const legendColors = [
+  "rgb(51, 51, 102)",
+  "rgb(51, 102, 204)",
+  "#66ccff",
+  "#c1eaff",
+  "#d8e3e8",
+  "#fffadf",
+  "#ffcc33",
+  "#ff9900",
+  "#ff6600",
+  "rgb(204, 0, 51)",
 ];
 
-const getColorForValue = (value) => {
-  for (let i = 0; i < legendRanges.length - 1; i++) {
-    if (value >= legendRanges[i].value && value < legendRanges[i + 1].value) {
-      return legendRanges[i];
-    }
-  }
-  if (value >= legendRanges[legendRanges.length - 1].value) {
-    return legendRanges[legendRanges.length - 1];
-  }
-  return legendRanges[0];
+const categoryCollapsesMap = {
+  1: ["11", "12"],
+  2: ["21", "22"],
+  3: ["31", "32"],
+  4: ["41", "43", "44", "45"],
+  5: ["51", "52", "53", "54", "55", "56"],
+  6: ["61", "62"],
+  7: ["71", "72", "73"],
+  8: ["82", "83"],
+  9: ["91", "92", "94", "95", "96"],
+  10: ["101", "102", "103", "105"],
+  11: ["111", "112"],
+  12: ["121", "123", "125", "126", "127"],
+};
+
+// build hierarchy from parsed3 using categoryCollapsesMap
+const buildHierarchy = (data) => {
+  return {
+    children: Object.entries(categoryCollapsesMap).map(([cat, subCodes]) => {
+      return {
+        code: cat,
+        children: data
+          .filter((d) => subCodes.includes(String(d.code)))
+          .map((d) => ({ ...d })),
+      };
+    }),
+  };
 };
 
 const RightPanel = ({ language }) => {
@@ -45,8 +64,10 @@ const RightPanel = ({ language }) => {
   const [parsed2, setParsed2] = useState([]);
   const [parsed3, setParsed3] = useState([]);
   const [parsed4, setParsed4] = useState([]);
+  const allCellsRef = useRef();
+  const rootRef = useRef(); // keep hierarchy root for highlighting
 
-  // Load data from localStorage
+  // Load data
   useEffect(() => {
     const loadData = () => {
       const saved = localStorage.getItem("result");
@@ -61,12 +82,9 @@ const RightPanel = ({ language }) => {
       let parsed3Data = saved3 ? JSON.parse(saved3) : [];
       let parsed4Data = saved4 ? JSON.parse(saved4) : [];
 
-      // merge index values into parsed3Data
       parsed3Data.forEach((item1) => {
         const match = parsed4Data.find((item2) => item2.code === item1.code);
-        if (match) {
-          item1.index = match.index;
-        }
+        if (match) item1.index = match.index;
       });
 
       setParsed3(parsed3Data);
@@ -74,154 +92,141 @@ const RightPanel = ({ language }) => {
     };
 
     loadData();
-
     window.addEventListener("localStorageUpdated", loadData);
     return () => window.removeEventListener("localStorageUpdated", loadData);
   }, []);
 
-  // weights
-  let cl1 = parsed[0]?.weight;
-  cl1 = cl1 ? `${(Number(cl1) * 100).toFixed(2)}%` : "N/A";
+  // Prepare left and right categories with weight & priceChange
+  const prepareCategories = () => {
+    const left = parsed.slice(0, 6).map((item, i) => ({
+      code: `${i + 1}`,
+      icon: [imgs1, imgs2, imgs3, imgs4, imgs5, imgs6][i],
+      title: [
+        language === "GE"
+          ? "სურსათი და უალკოჰოლო სასმელები"
+          : "FOOD AND NON-ALCOHOLIC BEVERAGES",
+        language === "GE"
+          ? "ალკოჰოლური სასმელები, თამბაქო"
+          : "ALCOHOLIC BEVERAGES AND TOBACCO",
+        language === "GE"
+          ? "ტანსაცმელი და ფეხსაცმელი"
+          : "CLOTHING AND FOOTWEAR",
+        language === "GE"
+          ? "საცხოვრებელი სახლი, წყალი,ელექტროენერგია, აირი და სათბობის სხვა სახეები"
+          : "Housing, water, electricity, gas and other fuels",
+        language === "GE"
+          ? "ავეჯი, საოჯახო ნივთებიდა მორთულობა, სახლის მოვლა-შეკეთება"
+          : "Furnishings, household equipment and routine maintenance",
+        language === "GE" ? "ჯანმრთელობის დაცვა" : "HEALTHCARE",
+      ][i],
+      description: [
+        language === "GE"
+          ? "სურსათი, უალკოჰოლო სასმელები"
+          : "Food, Non-Alcoholic Beverages",
+        language === "GE"
+          ? "ალკოჰოლური სასმელები, თამბაქოს ნაწარმი"
+          : "Alcoholic Beverages, Tobacco",
+        language === "GE" ? "ტანსაცმელი,ფეხსაცმელი" : "Clothing,Footwear",
+        language === "GE"
+          ? "გადასახადი საცხოვრებელზე; ელექტროენერგია, აირი და სათბობის სხვა სახეები; წყალმომარაგება; საცხოვრებლის მოვლა-შეკეთება და სხვა"
+          : "Actual rentals for housing; Maintenance and repair of the dwelling; Water supply and miscellaneous services relating to the dwelling; Electricity, gas and other fuels",
+        language === "GE"
+          ? "ავეჯი და საოჯახო ნივთები; საყოფაცხოვრებო საქონელი; მაცივრები, სარეცხი მანქანები; ჭურჭელი, და სხვა."
+          : "Furniture, furnishings, etc.; Household textiles; Household appliances; Glassware, tableware and household utensils;Tools and equipment for house and garden; Goods and services for routine household maintenance",
+        language === "GE"
+          ? "მედიკამენტები, სამედიცინო პროდუქცია; სამედიცინო მომსახურება"
+          : "Medical products, appliances and equipment; Out-patient services;Hospital services",
+      ][i],
+      annualGrowth: item?.weight
+        ? `${(Number(item.weight) * 100).toFixed(2)}%`
+        : "N/A",
+      priceChange: parsed2[i] ? `${parsed2[i]}%` : "N/A",
+    }));
 
-  let cl2 = parsed[1]?.weight;
-  cl2 = cl2 ? `${(Number(cl2) * 100).toFixed(2)}%` : "N/A";
-
-  let cl3 = parsed[2]?.weight;
-  cl3 = cl3 ? `${(Number(cl3) * 100).toFixed(2)}%` : "N/A";
-
-  let cl4 = parsed[3]?.weight;
-  cl4 = cl4 ? `${(Number(cl4) * 100).toFixed(2)}%` : "N/A";
-
-  let cl5 = parsed[4]?.weight;
-  cl5 = cl5 ? `${(Number(cl5) * 100).toFixed(2)}%` : "N/A";
-
-  let cl6 = parsed[5]?.weight;
-  cl6 = cl6 ? `${(Number(cl6) * 100).toFixed(2)}%` : "N/A";
-
-  const categoriesLeft = [
-    {
-      code: "1",
-      icon: imgs1,
-      title: "სურსათი და უალკოჰოლო სასმელები",
-      description: "სურსათი, უალკოჰოლო სასმელები",
-      annualGrowth: cl1,
-    },
-    {
-      code: "2",
-      icon: imgs2,
-      title: "ალკოჰოლური სასმელები, თამბაქო",
-      description: "ალკოჰოლური სასმელები, თამბაქოს ნაწარმი",
-      annualGrowth: cl2,
-    },
-    {
-      code: "3",
-      icon: imgs3,
-      title: "ტანსაცმელი და ფეხსაცმელი",
-      description: "ტანსაცმელი და ფეხსაცმელი",
-      annualGrowth: cl3,
-    },
-    {
-      code: "4",
-      icon: imgs4,
-      title: "საყოფაცხოვრებო ნივთები, ავეჯი და სახლის მოვლა",
-      description:
-        "საყოფაცხოვრებო ნივთები, ავეჯი, საოჯახო ტექნიკა, სახლის მოვლა",
-      annualGrowth: cl4,
-    },
-    {
-      code: "5",
-      icon: imgs5,
-      title: "კომუნალური მომსახურება, წყალმომარაგება, გაზი და საწვავი",
-      description:
-        "ელექტროენერგია, ბუნებრივი გაზი, საწვავი; წყალმომარაგება, სანიტარული მომსახურება",
-      annualGrowth: cl5,
-    },
-    {
-      code: "6",
-      icon: imgs6,
-      title: "ჯანმრთელობის დაცვა",
-      description: "ჯანმრთელობის მომსახურება, სამედიცინო პროდუქცია",
-      annualGrowth: cl6,
-    },
-  ];
-
-  categoriesLeft.forEach((item, index) => {
-    item.priceChange = parsed2[index] ? `${parsed2[index]}%` : "N/A";
-  });
-
-  let cr7 = parsed[6]?.weight;
-  cr7 = cr7 ? `${(Number(cr7) * 100).toFixed(2)}%` : "N/A";
-
-  let cr8 = parsed[7]?.weight;
-  cr8 = cr8 ? `${(Number(cr8) * 100).toFixed(2)}%` : "N/A";
-
-  let cr9 = parsed[8]?.weight;
-  cr9 = cr9 ? `${(Number(cr9) * 100).toFixed(2)}%` : "N/A";
-
-  let cr10 = parsed[9]?.weight;
-  cr10 = cr10 ? `${(Number(cr10) * 100).toFixed(2)}%` : "N/A";
-
-  let cr11 = parsed[10]?.weight;
-  cr11 = cr11 ? `${(Number(cr11) * 100).toFixed(2)}%` : "N/A";
-
-  let cr12 = parsed[11]?.weight;
-  cr12 = cr12 ? `${(Number(cr12) * 100).toFixed(2)}%` : "N/A";
-
-  const categoriesRight = [
-    {
-      code: "7",
-      icon: imgs7,
-      title: language === "GE" ? "ტრანსპორტი" : "TRANSPORT",
-      description:
+    const right = parsed.slice(6, 12).map((item, i) => ({
+      code: `${i + 7}`,
+      icon: [imgs7, imgs8, imgs9, imgs10, imgs11, imgs12][i],
+      title: [
+        language === "GE" ? "ტრანსპორტი" : "TRANSPORT",
+        language === "GE" ? "კავშირგაბმულობა" : "COMMUNICATION",
+        language === "GE"
+          ? "დასვენება, გართობა და კულტურა"
+          : "RECREATION AND CULTURE",
+        language === "GE" ? "განათლება" : "EDUCATION",
+        language === "GE"
+          ? "სასტუმროები, კაფეები და რესტორნები"
+          : "HOTELS, CAFES AND RESTAURANTS",
+        language === "GE"
+          ? "სხვადასხვა საქონელი და მომსახურება"
+          : "MISCELLANEOUS GOODS AND SERVICES",
+      ][i],
+      description: [
         language === "GE"
           ? "სატრანსპორტო საშუალებების შეძენა და ექსპლუატაცია; სატრანსპორტო მომსახურება"
           : "Purchase and operation of transport vehicles; transport services",
-      annualGrowth: cr7,
-    },
-    {
-      code: "8",
-      icon: imgs8,
-      title: "კომუნიკაციები",
-      description: "საკომუნიკაციო მომსახურება და ტელეფონები",
-      annualGrowth: cr8,
-    },
-    {
-      code: "9",
-      icon: imgs9,
-      title: "დასვენება, გართობა და კულტურა",
-      description: "დასვენება, კულტურული და გართობის მომსახურება",
-      annualGrowth: cr9,
-    },
-    {
-      code: "10",
-      icon: imgs10,
-      title: "განათლება",
-      description: "სასწავლო დაწესებულებების საფასური",
-      annualGrowth: cr10,
-    },
-    {
-      code: "11",
-      icon: imgs11,
-      title: "სასტუმროები, კაფეები და რესტორნები",
-      description: "სასტუმროები, კაფეები და რესტორნები",
-      annualGrowth: cr11,
-    },
-    {
-      code: "12",
-      icon: imgs12,
-      title: "სხვა სახის საქონელი და მომსახურება",
-      description: "პერსონალური საქონელი, დაზღვევა, ფინანსური მომსახურება",
-      annualGrowth: cr12,
-    },
-  ];
+        language === "GE"
+          ? "სატელეფონო მოწყობილობები და საკომუნიკაციო მომსახურება"
+          : "Telephone and telefax equipment; Telephone and telefax services",
+        language === "GE"
+          ? "ფოტოგრაფიული და კომპიუტერული მოწყობილობები; გასართობი და კულტურული მომსახურება; ტურისტული მოგზაურობა; დასვენების, გართობისა და კულტურის სფეროს საქონელი და სხვა"
+          : "Audio-visual and information processing equipment; Other major durables for recreation and culture;Other recreational items and equipment, gardens and pets;Recreational and cultural services;Newspapers, books and stationery; journey",
+        language === "GE"
+          ? "სკოლამდელი, დაწყებითი, საშუალო და უმაღლესი განათლება, დონით განუსაზღვრელი განათლება"
+          : "Pre-primary and primary education; Secondary education;Post-secondary non-tertiary education; Education not definable by level",
+        language === "GE"
+          ? "რესტორნების, კაფეებისა და სასტუმროების მომსახურება"
+          : "Catering services;Accommodation services",
+        language === "GE"
+          ? "პირადი ჰიგიენა; პირადი ნივთები; ჯანმრთელობის დაზღვევა; საფინანსო მომსახურება"
+          : "Personal care;Personal effects n.e.c.; Insurance;Financial services n.e.c.; Other services n.e.c.",
+      ][i],
+      annualGrowth: item?.weight
+        ? `${(Number(item.weight) * 100).toFixed(2)}%`
+        : "N/A",
+      priceChange: parsed2[i + 6] ? `${parsed2[i + 6]}%` : "N/A",
+    }));
 
-  categoriesRight.forEach((item, index) => {
-    item.priceChange = parsed2[index + 6] ? `${parsed2[index + 6]}%` : "N/A";
-  });
+    return { left, right };
+  };
+
+  const { left: categoriesLeft, right: categoriesRight } = prepareCategories();
+
+  // Highlight functions
+  const highlightCategory = (code) => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const categoryNode = root.children.find(
+      (c) => c.data.code === String(code)
+    );
+    if (!categoryNode) return;
+
+    const leafCodes = categoryNode.leaves().map((d) => String(d.data.code));
+
+    allCellsRef.current
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 4)
+      .attr("opacity", 0.7);
+
+    allCellsRef.current
+      .filter((d) => leafCodes.includes(String(d.data.code)))
+      .attr("stroke", "white")
+      .attr("stroke-width", 7)
+      .attr("opacity", 1);
+  };
+
+  const resetHighlight = () => {
+    allCellsRef.current
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 4)
+      .attr("opacity", 0.7);
+  };
 
   // Voronoi Treemap
   useEffect(() => {
     if (!parsed3 || parsed3.length === 0) return;
+
+    const hierarchyData = buildHierarchy(parsed3);
 
     const w = 500;
     const h = 500;
@@ -236,31 +241,25 @@ const RightPanel = ({ language }) => {
       ];
     });
 
+    const radiusWhite = Math.min(w, h) / 2.03 - padding;
+
     const root = d3
-      .hierarchy({ children: parsed3 })
-      .sum((d) => +d.weight)
+      .hierarchy(hierarchyData)
+      .sum((d) => +d.weight || 0)
       .sort((a, b) => b.value - a.value);
+
+    rootRef.current = root;
 
     const vt = voronoiTreemap().clip(circleClip);
     vt(root);
 
     const nodes = root.leaves();
-    const color = d3
-      .scaleOrdinal()
-      .domain(parsed3.map((d) => d.title_geo))
-      .range(d3.schemeTableau10);
-
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
-    svg
-      .attr("width", w)
-      .attr("height", h)
-      .attr("viewBox", `0 0 ${w} ${h}`)
-      .attr("preserveAspectRatio", "xMidYMid meet");
+    svg.attr("width", w).attr("height", h).attr("viewBox", `0 0 ${w} ${h}`);
 
     const g = svg.append("g");
 
-    // Tooltip
     const tooltip = d3
       .select("body")
       .append("div")
@@ -275,37 +274,85 @@ const RightPanel = ({ language }) => {
       .style("display", "none")
       .style("z-index", 1000);
 
-    // Draw cells
-    g.selectAll("path")
+    const allCells = g
+      .selectAll("path")
       .data(nodes)
       .enter()
       .append("path")
       .attr("d", (d) => "M" + d.polygon.join("L") + "Z")
-      .attr("fill", (d) => color(d.data.title_geo))
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 1)
-      .on("mouseover", (event, d) => {
-        tooltip
-          .style("display", "block")
-            .html(
-            `${d.data.title_geo}<br/>ფასების ცვლილება: ${d.data.index || 0}%<br/>წონა: ${d.data.weight}%`
-            );
+      .attr("fill", (d) => {
+        let val = d.data.index || 0;
+        if (val <= legendValues[0]) return legendColors[0];
+        if (val >= legendValues[legendValues.length - 1])
+          return legendColors[legendColors.length - 1];
+        for (let i = 0; i < legendValues.length - 1; i++) {
+          if (val >= legendValues[i] && val < legendValues[i + 1]) {
+            return legendColors[i + 1];
+          }
+        }
+        return "#ccc";
       })
-      .on("mousemove", (event) => {
-          tooltip
-            .style("left", event.pageX + 10 + "px")
-            .style("top", event.pageY - 10 + "px");
-        })
-      .on("mouseout", () => tooltip.style("display", "none"));
+      .attr("opacity", 0.7)
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 4)
+      .on("mouseover", function (event, d) {
+        d3.select(this).attr("stroke", "white").attr("stroke-width", 7);
+        tooltip.style("display", "block").html(`
+          ${language === "GE" ? d.data.title_geo : d.data.title_en}<br/>
+          ${
+            language === "GE"
+              ? `ფასების ცვლილება: ${d.data.index || 0}%`
+              : `Price change: ${d.data.index || 0}%`
+          }<br/>
+          ${
+            language === "GE"
+              ? `წონა: ${d.data.weight}%`
+              : `Weight: ${d.data.weight}%`
+          }
+        `);
+      })
+      .on("mousemove", function (event) {
+        tooltip
+          .style("left", event.pageX + 10 + "px")
+          .style("top", event.pageY - 10 + "px");
+      })
+      .on("mouseout", function () {
+        d3.select(this)
+          .attr("stroke", "#fff")
+          .attr("stroke-width", 4)
+          .attr("opacity", 0.7);
+        tooltip.style("display", "none");
+      });
+
+    allCellsRef.current = allCells;
+
+    g.append("circle")
+      .attr("cx", w / 2)
+      .attr("cy", h / 2)
+      .attr("r", radiusWhite)
+      .attr("fill", "none")
+      .attr("stroke", "white")
+      .attr("stroke-width", 7);
+
+    g.append("circle")
+      .attr("cx", w / 2)
+      .attr("cy", h / 2)
+      .attr("r", radius)
+      .attr("fill", "none")
+      .attr("stroke", "gray")
+      .attr("stroke-width", 6);
   }, [parsed3]);
 
   return (
     <div className="flex flex-col sm:flex-row flex-1 p-4 gap-4">
-      <div className="w-full sm:w-1/4 flex flex-col gap-4 font-bpg-nino">
+      {/* LEFT PANEL */}
+      <div className="w-full sm:w-1/4 flex flex-col gap-4 font-bpg-nino cursor-pointer">
         {categoriesLeft.map((item, index) => (
           <div
             key={index}
             className="flex items-start gap-3 p-3 bg-white shadow rounded"
+            onMouseEnter={() => highlightCategory(item.code)}
+            onMouseLeave={resetHighlight}
           >
             <img
               src={item.icon}
@@ -318,47 +365,56 @@ const RightPanel = ({ language }) => {
               </h2>
               <p className="text-gray-600 text-sm mb-1">{item.description}</p>
               <p className="text-gray-700 text-sm">
-                ჯგუფის წონა: {item.annualGrowth}
+                {language === "GE"
+                  ? `ჯგუფის წონა: ${item.annualGrowth}`
+                  : `Group Weight: ${item.annualGrowth}`}
               </p>
               <p className="text-gray-700 text-sm">
-                ფასის ცვლილება: {item.priceChange}
+                {language === "GE"
+                  ? `ფასის ცვლილება: ${item.priceChange}`
+                  : `Price Change: ${item.priceChange}`}
               </p>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="w-full sm:w-1/2 flex flex-col items-center justify-center bg-gray-100 rounded min-h-[400px] p-4 max-w-full overflow-x-auto cursor-pointer">
-        <svg ref={svgRef} className="w-full max-w-[500px] h-auto" />
+      {/* CHART + LEGEND */}
+      <div className="w-full sm:w-1/2 flex flex-col items-center bg-gray-100 rounded min-h-[400px] p-4 max-w-full overflow-x-auto cursor-pointer">
+        <svg ref={svgRef} className="w-full max-w-[550px] h-auto" />
         <div className="mt-4 flex flex-col items-center w-full max-w-[320px]">
           <div className="text-sm font-medium text-gray-700 mb-2 text-center">
-            ფასების პროცენტული ცვლილება
+            {language === "GE"
+              ? `ფასების პროცენტული ცვლილება`
+              : `Price Percentage Change`}
           </div>
-          <div className="flex items-center justify-center flex-wrap gap-1">
-            {legendRanges.map((range, idx) => (
-              <div key={idx} className="flex flex-col items-center mx-1">
-                <div
-                  className="w-6 h-4"
-                  style={{
-                    backgroundColor: range.fill,
-                    opacity: range.fillOpacity,
-                    border: "1px solid #999",
-                  }}
-                ></div>
-                <span className="text-xs text-gray-600 mt-1">
-                  {range.value}
-                </span>
-              </div>
+          <div className="relative w-full max-w-[320px] h-4 rounded overflow-hidden">
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(to right, ${legendColors.join(
+                  ", "
+                )})`,
+                opacity: 0.7,
+              }}
+            ></div>
+          </div>
+          <div className="flex justify-between w-full max-w-[320px] mt-1 text-xs text-gray-600">
+            {legendValues.map((val, idx) => (
+              <span key={idx}>{val}</span>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="w-full sm:w-1/4 flex flex-col gap-4 font-bpg-nino">
+      {/* RIGHT PANEL */}
+      <div className="w-full sm:w-1/4 flex flex-col gap-4 font-bpg-nino cursor-pointer">
         {categoriesRight.map((item, index) => (
           <div
             key={index}
             className="flex items-start gap-3 p-3 bg-white shadow rounded"
+            onMouseEnter={() => highlightCategory(item.code)}
+            onMouseLeave={resetHighlight}
           >
             <img
               src={item.icon}
@@ -371,10 +427,14 @@ const RightPanel = ({ language }) => {
               </h2>
               <p className="text-gray-600 text-sm mb-1">{item.description}</p>
               <p className="text-gray-700 text-sm">
-                ჯგუფის წონა: {item.annualGrowth}
+                {language === "GE"
+                  ? `ჯგუფის წონა: ${item.annualGrowth}`
+                  : `Group Weight: ${item.annualGrowth}`}
               </p>
               <p className="text-gray-700 text-sm">
-                ფასის ცვლილება: {item.priceChange}
+                {language === "GE"
+                  ? `ფასის ცვლილება: ${item.priceChange}`
+                  : `Price Change: ${item.priceChange}`}
               </p>
             </div>
           </div>
