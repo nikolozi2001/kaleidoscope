@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { Delaunay } from "d3-delaunay";
+import { voronoiTreemap } from "d3-voronoi-treemap";
 
 import imgs1 from "../assets/images/food.png";
 import imgs2 from "../assets/images/alcohol.png";
@@ -40,14 +40,13 @@ const getColorForValue = (value) => {
 };
 
 const RightPanel = ({ language }) => {
+  const svgRef = useRef();
   const [parsed, setParsed] = useState([]);
   const [parsed2, setParsed2] = useState([]);
-  const [parsed3, setParsed3] = useState([]); // groupweightchart
-  const [parsed4, setParsed4] = useState([]); // groupindexchart
+  const [parsed3, setParsed3] = useState([]);
+  const [parsed4, setParsed4] = useState([]);
 
-  const svgRef = useRef();
-
-  // Load data initially + on event
+  // Load data from localStorage
   useEffect(() => {
     const loadData = () => {
       const saved = localStorage.getItem("result");
@@ -72,8 +71,6 @@ const RightPanel = ({ language }) => {
 
       setParsed3(parsed3Data);
       setParsed4(parsed4Data);
-
-      console.log(parsed3Data);
     };
 
     loadData();
@@ -222,131 +219,84 @@ const RightPanel = ({ language }) => {
     item.priceChange = parsed2[index + 6] ? `${parsed2[index + 6]}%` : "N/A";
   });
 
-  // D3 chart
+  // Voronoi Treemap
   useEffect(() => {
     if (!parsed3 || parsed3.length === 0) return;
 
-    const width = 500;
-    const height = 500;
+    const w = 500;
+    const h = 500;
+    const padding = 20;
+    const radius = Math.min(w, h) / 2 - padding;
 
-    const svg = d3.select(svgRef.current);
-    svg.selectAll("*").remove();
-
-    // Scale radius based on weight
-    const maxWeight = d3.max(parsed3, (d) => Number(d.weight)) || 1;
-    const baseRadius = d3.scaleLinear().domain([0, maxWeight]).range([50, 220]); // chart size per weight
-
-    const angleStep = (2 * Math.PI) / parsed3.length;
-    const points = parsed3.map((d, i) => {
-      const angle = i * angleStep;
-      const r = baseRadius(Number(d.weight));
+    const circleClip = d3.range(80).map((i) => {
+      const angle = (i / 80) * 2 * Math.PI;
       return [
-        width / 2 + r * Math.cos(angle),
-        height / 2 + r * Math.sin(angle),
+        w / 2 + radius * Math.cos(angle),
+        h / 2 + radius * Math.sin(angle),
       ];
     });
 
-    const delaunay = Delaunay.from(points);
-    const voronoi = delaunay.voronoi([0, 0, width, height]);
+    const root = d3
+      .hierarchy({ children: parsed3 })
+      .sum((d) => +d.weight)
+      .sort((a, b) => b.value - a.value);
 
-    svg
-      .attr("width", width)
-      .attr("height", height)
-      .append("defs")
-      .append("filter")
-      .attr("id", "drop-shadow")
-      .append("feDropShadow")
-      .attr("dx", 2)
-      .attr("dy", 2)
-      .attr("stdDeviation", 2)
-      .attr("flood-color", "rgba(0, 0, 0, 0.2)");
+    const vt = voronoiTreemap().clip(circleClip);
+    vt(root);
 
-    // Draw max circle outline
-    svg
-      .append("circle")
-      .attr("cx", width / 2)
-      .attr("cy", height / 2)
-      .attr("r", baseRadius(maxWeight))
-      .attr("fill", "none")
-      .attr("stroke", "grey")
-      .attr("stroke-width", 21);
+    const nodes = root.leaves();
+    const color = d3
+      .scaleOrdinal()
+      .domain(parsed3.map((d) => d.title_geo))
+      .range(d3.schemeTableau10);
 
+    const svg = d3.select(svgRef.current);
+    svg.selectAll("*").remove();
     svg
-      .append("circle")
-      .attr("cx", width / 2)
-      .attr("cy", height / 2)
-      .attr("r", baseRadius(maxWeight))
-      .attr("fill", "none")
+      .attr("width", w)
+      .attr("height", h)
+      .attr("viewBox", `0 0 ${w} ${h}`)
+      .attr("preserveAspectRatio", "xMidYMid meet");
+
+    const g = svg.append("g");
+
+    // Tooltip
+    const tooltip = d3
+      .select("body")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("position", "absolute")
+      .style("background", "rgba(255,255,255,0.9)")
+      .style("padding", "8px")
+      .style("border-radius", "4px")
+      .style("font-size", "12px")
+      .style("font-family", "BPG Nino Mtavruli")
+      .style("pointer-events", "none")
+      .style("display", "none")
+      .style("z-index", 1000);
+
+    // Draw cells
+    g.selectAll("path")
+      .data(nodes)
+      .enter()
+      .append("path")
+      .attr("d", (d) => "M" + d.polygon.join("L") + "Z")
+      .attr("fill", (d) => color(d.data.title_geo))
       .attr("stroke", "#fff")
-      .attr("stroke-width", 5);
-
-    svg
-      .append("clipPath")
-      .attr("id", "circle-clip")
-      .append("circle")
-      .attr("cx", width / 2)
-      .attr("cy", height / 2)
-      .attr("r", baseRadius(maxWeight));
-
-    const g = svg.append("g").attr("clip-path", "url(#circle-clip)");
-
-    const minStroke = 3;
-    const maxStroke = 8;
-    const maxVal = d3.max(parsed3, (d) => Math.abs(Number(d.index))) || 1;
-
-    points.forEach((point, i) => {
-      const cell = voronoi.cellPolygon(i);
-      if (!cell) return;
-
-      const { fill, fillOpacity } = getColorForValue(Number(parsed3[i].index));
-
-      g.append("path")
-        .attr("d", "M" + cell.join("L") + "Z")
-        .attr("fill", fill)
-        .attr("fill-opacity", fillOpacity)
-        .attr("stroke", "#fff")
-        .attr("stroke-width", () => {
-          const val = Math.abs(Number(parsed3[i].index));
-          return minStroke + (val / maxVal) * (maxStroke - minStroke);
-        })
-        .attr("opacity", 0.9)
-        .style("filter", "url(#drop-shadow)")
-        .on("mouseover", function (event) {
-          d3.select(this)
-            .attr("opacity", 1)
-            .attr("stroke-width", 7)
-            .attr("stroke", "white");
-
-          const tooltip = d3
-            .select("body")
-            .append("div")
-            .attr("class", "tooltip")
-            .style("position", "absolute")
-            .style("background", "rgba(255,255,255)")
-            .style("color", "black")
-            .style("padding", "8px")
-            .style("border-radius", "4px")
-            .style("font-size", "12px")
-            .style("font-family", "BPG Nino Mtavruli")
-            .style("pointer-events", "none")
-            .style("z-index", "1000")
+      .attr("stroke-width", 1)
+      .on("mouseover", (event, d) => {
+        tooltip
+          .style("display", "block")
             .html(
-              `${parsed3[i].title_geo}<br/>ფასების ცვლილება: ${parsed3[i].index}%<br/>წონა: ${parsed3[i].weight}%`
+            `${d.data.title_geo}<br/>ფასების ცვლილება: ${d.data.index || 0}%<br/>წონა: ${d.data.weight}%`
             );
-
+      })
+      .on("mousemove", (event) => {
           tooltip
             .style("left", event.pageX + 10 + "px")
             .style("top", event.pageY - 10 + "px");
         })
-        .on("mouseout", function () {
-          d3.select(this)
-            .attr("opacity", 0.9)
-            .attr("stroke-width", 3)
-            .attr("stroke", "#fff");
-
-          d3.selectAll(".tooltip").remove();
-        });
-    });
+      .on("mouseout", () => tooltip.style("display", "none"));
   }, [parsed3]);
 
   return (
@@ -379,14 +329,8 @@ const RightPanel = ({ language }) => {
       </div>
 
       <div className="w-full sm:w-1/2 flex flex-col items-center justify-center bg-gray-100 rounded min-h-[400px] p-4 max-w-full overflow-x-auto cursor-pointer">
-        <svg
-          ref={svgRef}
-          className="w-full max-w-[500px] h-auto"
-          viewBox="0 0 500 500"
-          preserveAspectRatio="xMidYMid meet"
-        ></svg>
-
-        <div className="mt-20 flex flex-col items-center w-full max-w-[320px]">
+        <svg ref={svgRef} className="w-full max-w-[500px] h-auto" />
+        <div className="mt-4 flex flex-col items-center w-full max-w-[320px]">
           <div className="text-sm font-medium text-gray-700 mb-2 text-center">
             ფასების პროცენტული ცვლილება
           </div>
