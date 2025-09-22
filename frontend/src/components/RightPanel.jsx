@@ -35,16 +35,16 @@ const categoryCollapsesMap = {
   3: ["31", "32"],
   4: ["41", "43", "44", "45"],
   5: ["51", "52", "53", "54", "55", "56"],
-  6: ["61", "62"],
+  6: ["61", "62", "63"],
   7: ["71", "72", "73"],
   8: ["82", "83"],
-  9: ["91", "92", "94", "95", "96"],
+  9: ["91", "92","93","94", "95", "96"],
   10: ["101", "102", "103", "105"],
   11: ["111", "112"],
   12: ["121", "123", "125", "126", "127"],
 };
 
-// build hierarchy from parsed3 using categoryCollapsesMap
+//  build hierarchy from parsed3 using categoryCollapsesMap
 const buildHierarchy = (data) => {
   return {
     children: Object.entries(categoryCollapsesMap).map(([cat, subCodes]) => {
