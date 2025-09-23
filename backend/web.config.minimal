@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <system.webServer>
+    
+    <!-- Handler for Node.js applications -->
+    <handlers>
+      <add name="iisnode" path="server.js" verb="*" modules="iisnode" />
+    </handlers>
+    
+    <!-- Basic IISNODE configuration -->
+    <iisnode 
+      nodeProcessCommandLine="&quot;%programfiles%\nodejs\node.exe&quot;"
+      loggingEnabled="true"
+      debuggingEnabled="false"
+      devErrorsEnabled="false" />
+
+    <!-- URL Rewrite rules -->
+    <rewrite>
+      <rules>
+        <!-- Route all requests to Node.js -->
+        <rule name="DynamicContent">
+          <conditions>
+            <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="True"/>
+          </conditions>
+          <action type="Rewrite" url="server.js"/>
+        </rule>
+      </rules>
+    </rewrite>
+
+    <!-- Error handling -->
+    <httpErrors errorMode="Detailed" />
+
+    <!-- Default documents -->
+    <defaultDocument>
+      <files>
+        <clear />
+        <add value="server.js" />
+      </files>
+    </defaultDocument>
+
+  </system.webServer>
+  
+  <!-- Application settings -->
+  <appSettings>
+    <add key="NODE_ENV" value="production" />
+  </appSettings>
+  
+</configuration>

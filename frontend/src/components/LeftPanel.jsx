@@ -4,7 +4,9 @@ import imgskalk from "../assets/images/spi-kalkulatori.jpg";
 import basketImg from "../assets/images/bascket.svg";
 import pressImg from "../assets/images/icon.svg";
 import InfoModal from "./InfoModal";
-import api from "../api";
+import ErrorDisplay from "./ErrorDisplay";
+import { LoadingButton } from "./LoadingSpinner";
+import api, { withLoading } from "../api";
 
 const months = {
   GE: ["იანვარი","თებერვალი","მარტი","აპრილი","მაისი","ივნისი","ივლისი","აგვისტო","სექტემბერი","ოქტომბერი","ნოემბერი","დეკემბერი"],
@@ -22,90 +24,93 @@ const LeftPanel = ({ language }) => {
   const [compareTo, setCompareTo] = useState("prevYear");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [resultText, setResultText] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleCalculate = async () => {
     if (!month) return;
+    
     let calculated = null;
 
     try {
-      // Left Panel
-      if (compareTo === "prevMonth") {
-        const response = await api.get(`/groupindex/${year}/${month}/0/0`);
-        const index_now = response.data[0].index;
+      await withLoading(async () => {
+        // Left Panel
+        if (compareTo === "prevMonth") {
+          const response = await api.get(`/groupindex/${year}/${month}/0/0`);
+          const index_now = response.data[0].index;
 
-        const month_old = month == 1 ? 12 : month - 1;
-        const year_old = month_old == 12 ? year - 1 : year;
+          const month_old = month == 1 ? 12 : month - 1;
+          const year_old = month_old == 12 ? year - 1 : year;
 
-        const response2 = await api.get(`/groupindex/${year_old}/${month_old}/0/0`);
-        const index_now2 = response2.data[0].index;
+          const response2 = await api.get(`/groupindex/${year_old}/${month_old}/0/0`);
+          const index_now2 = response2.data[0].index;
 
-        calculated = ((index_now / index_now2) * 100 - 100).toFixed(2);
-      } else if (compareTo === "prevYear") {
-        const response = await api.get(`/groupindex/${year}/${month}/0/0`);
-        const index_now = response.data[0].index;
+          calculated = ((index_now / index_now2) * 100 - 100).toFixed(2);
+        } else if (compareTo === "prevYear") {
+          const response = await api.get(`/groupindex/${year}/${month}/0/0`);
+          const index_now = response.data[0].index;
 
-        const year_old = parseInt(year) - 1;
-        const month_old = parseInt(month);
+          const year_old = parseInt(year) - 1;
+          const month_old = parseInt(month);
 
-        const response2 = await api.get(`/groupindex/${year_old}/${month_old}/0/0`);
-        const index_now2 = response2.data[0].index;
+          const response2 = await api.get(`/groupindex/${year_old}/${month_old}/0/0`);
+          const index_now2 = response2.data[0].index;
 
-        calculated = ((index_now / index_now2) * 100 - 100).toFixed(2);
-      }
+          calculated = ((index_now / index_now2) * 100 - 100).toFixed(2);
+        }
+
+        // Group weight
+        const response = await api.get(`/groupweight/${year}/1`);
+        localStorage.setItem("result", JSON.stringify(response.data));
+        window.dispatchEvent(new Event("storage"));
+
+        // Right Panel
+        const groupindex_now = (await api.get(`/groupindexrightpanel/${year}/${month}/1`)).data;
+        let groupindex_year_old = compareTo === "prevYear" ? parseInt(year) - 1 : (month == 1 ? year - 1 : year);
+        let groupindex_month_old = compareTo === "prevYear" ? parseInt(month) : (month == 1 ? 12 : month - 1);
+
+        const groupindex_old = (await api.get(`/groupindexrightpanel/${groupindex_year_old}/${groupindex_month_old}/1`)).data;
+        const groupindex_calculated = groupindex_now.map((g, i) => ((g.index / groupindex_old[i].index) * 100 - 100).toFixed(2));
+        localStorage.setItem("groupindex_pricechanges", JSON.stringify(groupindex_calculated));
+        window.dispatchEvent(new Event("storage"));
+
+        // Charts
+        const groupweightchart = (await api.get(`/groupweightchart/${year}`)).data;
+        localStorage.setItem("groupweightchart", JSON.stringify(groupweightchart));
+        window.dispatchEvent(new Event("storage"));
+
+        const groupindex2_now = (await api.get(`/groupindexrightpanel/${year}/${month}/2`)).data;
+        const groupindex2_old = (await api.get(`/groupindexrightpanel/${groupindex_year_old}/${groupindex_month_old}/2`)).data;
+
+        groupindex2_now.forEach((_, i) => {
+          groupindex2_now[i].index = ((groupindex2_now[i].index / groupindex2_old[i].index) * 100 - 100).toFixed(2);
+        });
+        localStorage.setItem("groupindexchart", JSON.stringify(groupindex2_now));
+        window.dispatchEvent(new Event("localStorageUpdated"));
+
+        // Result text
+        const selectedMonthName = months[language === "GE" ? "GE" : "EN"][parseInt(month) - 1] || "";
+        const selectedMonthNameLocative = months["GE_LOCATIVE"][parseInt(month) - 1] || "";
+
+        if (language === "GE") {
+          const comparison = compareTo === "prevYear" ? "წინა წლის შესაბამის თვესთან" : "წინა თვესთან";
+          setResultText(`${year} წლის ${selectedMonthNameLocative} ინფლაციის დონემ ${comparison} შედარებით შეადგინა ${calculated}%`);
+        } else {
+          const comparison = compareTo === "prevYear" ? "compared to the same month last year" : "compared to previous month";
+          setResultText(`In ${selectedMonthName} ${year} the inflation rate ${comparison} amounted to ${calculated}%`);
+        }
+      }, setLoading, setError);
+
     } catch (error) {
       console.error("Error fetching data:", error);
       setResultText(language === "GE" ? "დაფიქსირდა შეცდომა მონაცემების მიღებისას" : "Error fetching data");
-      return;
-    }
-
-    try {
-      // Group weight
-      const response = await api.get(`/groupweight/${year}/1`);
-      localStorage.setItem("result", JSON.stringify(response.data));
-      window.dispatchEvent(new Event("storage"));
-
-      // Right Panel
-      const groupindex_now = (await api.get(`/groupindexrightpanel/${year}/${month}/1`)).data;
-      let groupindex_year_old = compareTo === "prevYear" ? parseInt(year) - 1 : (month == 1 ? year - 1 : year);
-      let groupindex_month_old = compareTo === "prevYear" ? parseInt(month) : (month == 1 ? 12 : month - 1);
-
-      const groupindex_old = (await api.get(`/groupindexrightpanel/${groupindex_year_old}/${groupindex_month_old}/1`)).data;
-      const groupindex_calculated = groupindex_now.map((g, i) => ((g.index / groupindex_old[i].index) * 100 - 100).toFixed(2));
-      localStorage.setItem("groupindex_pricechanges", JSON.stringify(groupindex_calculated));
-      window.dispatchEvent(new Event("storage"));
-
-      // Charts
-      const groupweightchart = (await api.get(`/groupweightchart/${year}`)).data;
-      localStorage.setItem("groupweightchart", JSON.stringify(groupweightchart));
-      window.dispatchEvent(new Event("storage"));
-
-      const groupindex2_now = (await api.get(`/groupindexrightpanel/${year}/${month}/2`)).data;
-      const groupindex2_old = (await api.get(`/groupindexrightpanel/${groupindex_year_old}/${groupindex_month_old}/2`)).data;
-
-      groupindex2_now.forEach((_, i) => {
-        groupindex2_now[i].index = ((groupindex2_now[i].index / groupindex2_old[i].index) * 100 - 100).toFixed(2);
-      });
-      localStorage.setItem("groupindexchart", JSON.stringify(groupindex2_now));
-      window.dispatchEvent(new Event("localStorageUpdated"));
-
-      // Result text
-      const selectedMonthName = months[language === "GE" ? "GE" : "EN"][parseInt(month) - 1] || "";
-      const selectedMonthNameLocative = months["GE_LOCATIVE"][parseInt(month) - 1] || "";
-
-      if (language === "GE") {
-        const comparison = compareTo === "prevYear" ? "წინა წლის შესაბამის თვესთან" : "წინა თვესთან";
-        setResultText(`${year} წლის ${selectedMonthNameLocative} ინფლაციის დონემ ${comparison} შედარებით შეადგინა ${calculated}%`);
-      } else {
-        const comparison = compareTo === "prevYear" ? "compared to the same month last year" : "compared to previous month";
-        setResultText(`In ${selectedMonthName} ${year} the inflation rate ${comparison} amounted to ${calculated}%`);
-      }
-
-    } catch (error) {
-      console.error("Error fetching additional data:", error);
     }
   };
 
-  useEffect(() => { handleCalculate(); }, [language]);
+  useEffect(() => { 
+    handleCalculate(); 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language]);
 
   return (
     <div className="w-full px-4 py-6 space-y-6">
@@ -125,6 +130,9 @@ const LeftPanel = ({ language }) => {
           {language === "GE" ? "დროის პერიოდი" : "TIME PERIOD"}
         </p>
       </div>
+
+      {/* Error Display */}
+      {error && <ErrorDisplay error={error} onRetry={handleCalculate} language={language} />}
 
       {/* Dropdown filters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -148,9 +156,14 @@ const LeftPanel = ({ language }) => {
       </div>
 
       <div>
-        <button onClick={handleCalculate} className="w-full bg-gray-300 text-gray-700 py-3 rounded-md hover:bg-[#0080be] hover:text-white cursor-pointer transition duration-200 font-bpg-nino text-base">
+        <LoadingButton 
+          loading={loading}
+          onClick={handleCalculate}
+          language={language}
+          className="w-full bg-gray-300 text-gray-700 py-3 rounded-md hover:bg-[#0080be] hover:text-white cursor-pointer transition duration-200 font-bpg-nino text-base"
+        >
           {language === "GE" ? "განახლება" : "Update"}
-        </button>
+        </LoadingButton>
       </div>
 
       {resultText && <div className="text-center text-sm sm:text-base text-gray-700 font-bpg-nino">{resultText}</div>}
@@ -170,14 +183,14 @@ const LeftPanel = ({ language }) => {
       <div className="space-y-4">
         <div className="w-full bg-[#e9e7e7] hover:bg-[#0080be] hover:text-white cursor-pointer transition duration-200 rounded-md overflow-hidden">
           <img src={imgs} alt="icon" className="w-full h-auto object-cover" />
-          <a href="https://www.geostat.ge/personalinflation/" target="_blank">
+          <a href="https://www.geostat.ge/personalinflation/" target="_blank" rel="noopener noreferrer">
             <p className="text-center text-sm sm:text-base py-3 font-bpg-nino">{language === "GE" ? "პერსონალური ინფლაციის კალკულატორი" : "PERSONAL INFLATION CALCULATOR"}</p>
           </a>
         </div>
 
         <div className="w-full bg-[#e9e7e7] hover:bg-[#0080be] hover:text-white cursor-pointer transition duration-200 rounded-md overflow-hidden">
           <img src={imgskalk} alt="icon" className="w-full h-auto object-cover" />
-          <a href="https://www.geostat.ge/cpi/" target="_blank">
+          <a href="https://www.geostat.ge/cpi/" target="_blank" rel="noopener noreferrer">
             <p className="text-center text-sm sm:text-base py-3 font-bpg-nino">{language === "GE" ? "სფი კალკულატორი" : "CPI CALCULATOR"}</p>
           </a>
         </div>

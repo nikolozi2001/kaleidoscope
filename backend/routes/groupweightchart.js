@@ -1,14 +1,20 @@
 const express = require("express");
 const sql = require("mssql");
 const config = require("../dbConfig");
+const asyncHandler = require("../utils/asyncHandler");
+const { validate, schemas } = require("../middleware/validation");
+const logger = require("../config/logger");
 
 const router = express.Router();
 
 // GET /api/groupweightchart/:year
-router.get("/:year", async (req, res) => {
-  const { year } = req.params;
+router.get("/:year", 
+  validate(schemas.groupWeightChart),
+  asyncHandler(async (req, res) => {
+    const { year } = req.params;
 
-  try {
+    logger.info(`Fetching group weight chart data for year: ${year}`);
+
     let pool = await sql.connect(config);
     let result = await pool
       .request()
@@ -31,14 +37,22 @@ router.get("/:year", async (req, res) => {
       `);
 
     if (result.recordset.length === 0) {
-      return res.status(404).send("No data found for the given parameters.");
+      return res.status(404).json({
+        success: false,
+        error: {
+          message: "No data found for the given parameters."
+        }
+      });
     }
 
-    res.json(result.recordset);
-  } catch (err) {
-    console.error("SQL error:", err);
-    res.status(500).send("Server error while fetching groupweightchart data.");
-  }
-});
+    logger.info(`Successfully retrieved ${result.recordset.length} records`);
+
+    res.status(200).json({
+      success: true,
+      count: result.recordset.length,
+      data: result.recordset
+    });
+  })
+);
 
 module.exports = router;
