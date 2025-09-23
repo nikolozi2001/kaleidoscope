@@ -54,28 +54,13 @@ app.use(limiter);
 // Compression middleware
 app.use(compression());
 
-// CORS configuration - updated for IIS deployment
+// CORS configuration - Allow all origins for development/deployment flexibility
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl requests, etc.)
-    if (!origin) return callback(null, true);
-    
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:5173',
-      'http://localhost:8080',
-      process.env.FRONTEND_URL
-    ].filter(Boolean);
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true, // Allow all origins
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  optionsSuccessStatus: 200 // For legacy browser support
 };
 
 app.use(cors(corsOptions));
