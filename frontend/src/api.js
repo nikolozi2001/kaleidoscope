@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 // Create axios instance
 const api = axios.create({
@@ -29,7 +29,7 @@ api.interceptors.response.use(
     // Calculate request duration
     const duration = new Date() - response.config.metadata.startTime;
     console.log(`API Request to ${response.config.url} took ${duration}ms`);
-    
+
     // Handle the new API response format
     if (response.data && response.data.success) {
       return {
@@ -37,7 +37,7 @@ api.interceptors.response.use(
         data: response.data.data || response.data
       };
     }
-    
+
     return response;
   },
   async (error) => {
@@ -45,7 +45,7 @@ api.interceptors.response.use(
 
     // Retry logic for network errors or 5xx errors
     if (
-      (error.code === 'NETWORK_ERROR' || 
+      (error.code === 'NETWORK_ERROR' ||
        error.code === 'ECONNABORTED' ||
        (error.response && error.response.status >= 500)) &&
       !originalRequest._retry &&
@@ -53,24 +53,24 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
-      
+
       // Exponential backoff
       const delay = Math.pow(2, originalRequest._retryCount) * 1000;
-      
+
       console.warn(`Retrying request to ${originalRequest.url} (attempt ${originalRequest._retryCount}) after ${delay}ms`);
-      
+
       await new Promise(resolve => setTimeout(resolve, delay));
-      
+
       return api(originalRequest);
     }
 
     // Handle different types of errors
     let errorMessage = 'An unexpected error occurred';
-    
+
     if (error.response) {
       // Server responded with error status
       const { data, status } = error.response;
-      
+
       if (data && data.error && data.error.message) {
         errorMessage = data.error.message;
       } else if (status === 404) {
@@ -89,7 +89,7 @@ api.interceptors.response.use(
     const friendlyError = new Error(errorMessage);
     friendlyError.originalError = error;
     friendlyError.status = error.response?.status;
-    
+
     return Promise.reject(friendlyError);
   }
 );

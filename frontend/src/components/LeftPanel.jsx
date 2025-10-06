@@ -29,7 +29,7 @@ const LeftPanel = ({ language }) => {
 
   const handleCalculate = async () => {
     if (!month) return;
-    
+
     let calculated = null;
 
     try {
@@ -107,8 +107,8 @@ const LeftPanel = ({ language }) => {
     }
   };
 
-  useEffect(() => { 
-    handleCalculate(); 
+  useEffect(() => {
+    handleCalculate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language]);
 
@@ -136,11 +136,11 @@ const LeftPanel = ({ language }) => {
 
       {/* Dropdown filters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <select value={year} onChange={(e) => setYear(e.target.value)} className="border border-gray-300 rounded-md px-3 py-2 text-sm font-bpg-nino w-full">
+        <select value={year} onChange={(e) => setYear(e.target.value)} className="border border-gray-300 rounded-md px-3 py-2 text-sm font-bpg-nino w-full cursor-pointer">
           {Array.from({ length: 2025 - 2004 + 1 }, (_, i) => 2025 - i).map((y) => <option key={y} value={y}>{y}</option>)}
         </select>
 
-        <select value={month} onChange={(e) => setMonth(e.target.value)} className="border border-gray-300 rounded-md px-3 py-2 text-sm font-bpg-nino w-full">
+        <select value={month} onChange={(e) => setMonth(e.target.value)} className="border border-gray-300 rounded-md px-3 py-2 text-sm font-bpg-nino w-full cursor-pointer">
           <option value="" disabled>{language === "GE" ? "თვე" : "Month"}</option>
           {months[language === "GE" ? "GE" : "EN"].map((m, i) => {
             const monthValue = i + 1;
@@ -149,14 +149,14 @@ const LeftPanel = ({ language }) => {
           })}
         </select>
 
-        <select value={compareTo} onChange={(e) => setCompareTo(e.target.value)} className="col-span-1 sm:col-span-2 border border-gray-300 rounded-md px-3 py-2 text-sm font-bpg-nino w-full">
+        <select value={compareTo} onChange={(e) => setCompareTo(e.target.value)} className="col-span-1 sm:col-span-2 border border-gray-300 rounded-md px-3 py-2 text-sm font-bpg-nino w-full cursor-pointer">
           <option value="prevYear">{language === "GE" ? "წინა წლის შესაბამის თვესთან შედარებით" : "Compared to same month last year"}</option>
           <option value="prevMonth">{language === "GE" ? "წინა თვესთან შედარებით" : "Compared to previous month"}</option>
         </select>
       </div>
 
       <div>
-        <LoadingButton 
+        <LoadingButton
           loading={loading}
           onClick={handleCalculate}
           language={language}
@@ -169,12 +169,12 @@ const LeftPanel = ({ language }) => {
       {resultText && <div className="text-center text-sm sm:text-base text-gray-700 font-bpg-nino">{resultText}</div>}
 
       <div className="space-y-3">
-        <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 hover:bg-[#0080be] hover:text-white cursor-pointer transition duration-200 text-sm sm:text-base rounded-md font-bpg-nino">
+        <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 hover:bg-[#0080be] hover:text-white cursor-pointer transition duration-200 text-sm sm:text-sm rounded-md font-bpg-nino">
           <img src={basketImg} alt="Basket" className="w-5 h-5 object-contain" />
           <span>{language === "GE" ? "სამომხმარებლო კალათა" : "Consumer Basket"}</span>
         </button>
 
-        <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 hover:bg-[#0080be] hover:text-white cursor-pointer transition duration-200 text-sm sm:text-base rounded-md font-bpg-nino">
+        <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 hover:bg-[#0080be] hover:text-white cursor-pointer transition duration-200 text-sm sm:text-sm rounded-md font-bpg-nino">
           <img src={pressImg} alt="Press" className="w-5 h-5 object-contain" />
           <span>{language === "GE" ? "პრეს რელიზი" : "Press Release"}</span>
         </button>
@@ -184,14 +184,14 @@ const LeftPanel = ({ language }) => {
         <div className="w-full bg-[#e9e7e7] hover:bg-[#0080be] hover:text-white cursor-pointer transition duration-200 rounded-md overflow-hidden">
           <img src={imgs} alt="icon" className="w-full h-auto object-cover" />
           <a href="https://www.geostat.ge/personalinflation/" target="_blank" rel="noopener noreferrer">
-            <p className="text-center text-sm sm:text-base py-3 font-bpg-nino">{language === "GE" ? "პერსონალური ინფლაციის კალკულატორი" : "PERSONAL INFLATION CALCULATOR"}</p>
+            <p className="text-center text-sm sm:text-xs py-3 font-bpg-nino">{language === "GE" ? "პერსონალური ინფლაციის კალკულატორი" : "PERSONAL INFLATION CALCULATOR"}</p>
           </a>
         </div>
 
         <div className="w-full bg-[#e9e7e7] hover:bg-[#0080be] hover:text-white cursor-pointer transition duration-200 rounded-md overflow-hidden">
           <img src={imgskalk} alt="icon" className="w-full h-auto object-cover" />
           <a href="https://www.geostat.ge/cpi/" target="_blank" rel="noopener noreferrer">
-            <p className="text-center text-sm sm:text-base py-3 font-bpg-nino">{language === "GE" ? "სფი კალკულატორი" : "CPI CALCULATOR"}</p>
+            <p className="text-center text-sm sm:text-xs py-3 font-bpg-nino">{language === "GE" ? "სფი კალკულატორი" : "CPI CALCULATOR"}</p>
           </a>
         </div>
       </div>
