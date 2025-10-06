@@ -125,6 +125,47 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Database health check endpoint
+app.get('/api/health/db', async (req, res) => {
+  const sql = require("mssql");
+  const config = require("./dbConfig");
+  
+  try {
+    const pool = await sql.connect(config);
+    const result = await pool.request().query('SELECT 1 as test');
+    await pool.close();
+    
+    res.status(200).json({
+      success: true,
+      message: 'Database connection is healthy',
+      timestamp: new Date().toISOString(),
+      database: {
+        server: config.server,
+        database: config.database,
+        user: config.user,
+        connected: true
+      }
+    });
+  } catch (error) {
+    logger.error('Database health check failed:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Database connection failed',
+      timestamp: new Date().toISOString(),
+      error: {
+        code: error.code,
+        message: error.message
+      },
+      database: {
+        server: config.server,
+        database: config.database,
+        user: config.user,
+        connected: false
+      }
+    });
+  }
+});
+
 // API routes
 app.use("/api/items", itemsRoute);
 app.use("/api/groupindex", groupIndexRoute);
