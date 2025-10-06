@@ -38,7 +38,7 @@ const categoryCollapsesMap = {
   6: ["61", "62", "63"],
   7: ["71", "72", "73"],
   8: ["82", "83"],
-  9: ["91", "92","93","94", "95", "96"],
+  9: ["91", "92", "93", "94", "95", "96"],
   10: ["101", "102", "103", "105"],
   11: ["111", "112"],
   12: ["121", "123", "125", "126", "127"],
@@ -204,8 +204,8 @@ const RightPanel = ({ language }) => {
     const leafCodes = categoryNode.leaves().map((d) => String(d.data.code));
 
     allCellsRef.current
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 4)
+      .attr("stroke", "#9ca3af")
+      .attr("stroke-width", 3)
       .attr("opacity", 0.7);
 
     allCellsRef.current
@@ -217,8 +217,8 @@ const RightPanel = ({ language }) => {
 
   const resetHighlight = () => {
     allCellsRef.current
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 4)
+      .attr("stroke", "#9ca3af")
+      .attr("stroke-width", 3)
       .attr("opacity", 0.7);
   };
 
@@ -293,8 +293,8 @@ const RightPanel = ({ language }) => {
         return "#ccc";
       })
       .attr("opacity", 0.7)
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 4)
+      .attr("stroke", "#9ca3af") // gray outer border always visible
+      .attr("stroke-width", 3)
       .on("mouseover", function (event, d) {
         d3.select(this).attr("stroke", "white").attr("stroke-width", 7);
         tooltip.style("display", "block").html(`
@@ -318,11 +318,18 @@ const RightPanel = ({ language }) => {
       })
       .on("mouseout", function () {
         d3.select(this)
-          .attr("stroke", "#fff")
-          .attr("stroke-width", 4)
+          .attr("stroke", "#9ca3af")
+          .attr("stroke-width", 3)
           .attr("opacity", 0.7);
         tooltip.style("display", "none");
       });
+
+    // add white inner border
+    allCells
+      .clone(true)
+      .attr("fill", "none")
+      .attr("stroke", "white")
+      .attr("stroke-width", 2);
 
     allCellsRef.current = allCells;
 
@@ -363,13 +370,14 @@ const RightPanel = ({ language }) => {
               <h2 className="font-bold text-gray-800 text-sm sm:text-base">
                 {item.title}
               </h2>
-              <p className="text-gray-600 text-sm mb-1">{item.description}</p>
-              <p className="text-gray-700 text-sm">
+              <div className="border-b border-dark gray-300 my-1"></div>
+              <p className="text-gray-600 text-xs mb-1">{item.description}</p>
+              <p className="text-gray-700 text-base font-poppins">
                 {language === "GE"
                   ? `ჯგუფის წონა: ${item.annualGrowth}`
                   : `Group Weight: ${item.annualGrowth}`}
               </p>
-              <p className="text-gray-700 text-sm">
+              <p className="text-gray-700 text-base font-poppins">
                 {language === "GE"
                   ? `ფასის ცვლილება: ${item.priceChange}`
                   : `Price Change: ${item.priceChange}`}
@@ -383,7 +391,7 @@ const RightPanel = ({ language }) => {
       <div className="w-full sm:w-1/2 flex flex-col items-center bg-gray-100 rounded min-h-[400px] p-4 max-w-full overflow-x-auto cursor-pointer">
         <svg ref={svgRef} className="w-full max-w-[550px] h-auto" />
         <div className="mt-4 flex flex-col items-center w-full max-w-[320px]">
-          <div className="text-sm font-medium text-gray-700 mb-2 text-center">
+          <div className="text-sm font-medium text-gray-700 mb-6 text-center">
             {language === "GE"
               ? `ფასების პროცენტული ცვლილება`
               : `Price Percentage Change`}
@@ -425,13 +433,14 @@ const RightPanel = ({ language }) => {
               <h2 className="font-bold text-gray-800 text-sm sm:text-base">
                 {item.title}
               </h2>
-              <p className="text-gray-600 text-sm mb-1">{item.description}</p>
-              <p className="text-gray-700 text-sm">
+              <div className="border-b border-dark gray-300 my-1"></div>
+              <p className="text-gray-600 text-xs mb-1 ">{item.description}</p>
+              <p className="text-gray-700 text-base font-poppins">
                 {language === "GE"
                   ? `ჯგუფის წონა: ${item.annualGrowth}`
                   : `Group Weight: ${item.annualGrowth}`}
               </p>
-              <p className="text-gray-700 text-sm">
+              <p className="text-gray-700 text-base font-poppins">
                 {language === "GE"
                   ? `ფასის ცვლილება: ${item.priceChange}`
                   : `Price Change: ${item.priceChange}`}

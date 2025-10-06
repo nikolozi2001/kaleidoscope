@@ -37,7 +37,7 @@ const Header = (props) => {
       </div>
 
       <div className="flex-1 flex justify-center">
-        <h1 className="text-lg md:text-2xl font-semibold text-white text-center transition-colors duration-300">
+        <h1 className="text-lg md:text-2xl font-semibold text-white text-center transition-colors duration-300 [letter-spacing:4px]">
           {language === "GE" ? 'ფასების კალეიდოსკოპი' : 'PRICE KALEIDOSCOPE'}
         </h1>
       </div>
@@ -56,7 +56,7 @@ const Header = (props) => {
               alt="Language flag"
               className="h-5 w-5 md:h-6 md:w-6"
             />
-            <span className="text-xs md:text-sm text-white cursor-pointer">
+            <span className="text-xs md:text-sm text-white cursor-pointer bpg_mrgvlovani_caps">
               {language === "GE" ? "English" : "ქართული"}
             </span>
           </button>
