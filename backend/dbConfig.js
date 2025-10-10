@@ -41,4 +41,7 @@ if (process.env.NODE_ENV !== 'production') {
   console.log('Trust Certificate:', config.options.trustServerCertificate);
 }
 
-module.exports = config;
+module.exports = {
+  config,
+  dbName: process.env.DB_NAME
+};

@@ -1,6 +1,6 @@
 const express = require("express");
 const sql = require("mssql");
-const config = require("../dbConfig");
+const { config, dbName } = require("../dbConfig");
 const asyncHandler = require("../utils/asyncHandler");
 const { validate, schemas } = require("../middleware/validation");
 const logger = require("../config/logger");
@@ -26,8 +26,8 @@ router.get("/:year",
             ,FORMAT(TRY_CAST(gw.[weight] AS FLOAT) * 100, 'N2') AS weight
             ,tr.[title_geo]
             ,tr.[title_en]
-        FROM [kaleidoscope].[dbo].[groupweight] AS gw
-        JOIN [kaleidoscope].[dbo].[coicopgroup] AS tr
+        FROM [${dbName}].[dbo].[groupweight] AS gw
+        JOIN [${dbName}].[dbo].[coicopgroup] AS tr
           ON tr.code = gw.code
          AND tr.level = gw.level
         WHERE

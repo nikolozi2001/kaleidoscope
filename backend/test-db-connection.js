@@ -1,6 +1,6 @@
 require('dotenv').config();
 const sql = require("mssql");
-const config = require("./dbConfig");
+const { config } = require("./dbConfig");
 
 console.log('Database Configuration:');
 console.log('Server:', config.server);

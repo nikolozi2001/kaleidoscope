@@ -1,6 +1,6 @@
 const express = require("express");
 const sql = require("mssql");
-const config = require("../dbConfig");
+const { config } = require("../dbConfig");
 const asyncHandler = require("../utils/asyncHandler");
 const { validate, schemas } = require("../middleware/validation");
 const logger = require("../config/logger");

@@ -128,7 +128,7 @@ app.get('/api/health', (req, res) => {
 // Database health check endpoint
 app.get('/api/health/db', async (req, res) => {
   const sql = require("mssql");
-  const config = require("./dbConfig");
+  const { config } = require("./dbConfig");
   
   try {
     const pool = await sql.connect(config);
